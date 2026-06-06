@@ -125,28 +125,9 @@ function AuthPage() {
       <main className="flex-1 flex items-start justify-center px-4 py-10">
         <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-all duration-300`}>
           <div className="sss-section-header">
-            {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Member Sign In" : "Create Member Account"}
+            {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Log In" : "Create Account"}
           </div>
           <div className="sss-section-body">
-            {mode !== "forgot_password" && (
-              <div className="flex gap-2 mb-4 text-sm">
-                <button
-                  type="button"
-                  onClick={() => setMode("login")}
-                  className={`flex-1 py-2 border rounded-md transition-colors ${mode === "login" ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border"}`}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("register")}
-                  className={`flex-1 py-2 border rounded-md transition-colors ${mode === "register" ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border"}`}
-                >
-                  Register
-                </button>
-              </div>
-            )}
-            
             {mode === "forgot_password" && (
               <p className="text-sm text-muted-foreground mb-4">
                 Enter your email address and we will send you a link to reset your password.
@@ -321,7 +302,28 @@ function AuthPage() {
               )}
             </form>
           </div>
-          <div className="text-xs text-muted-foreground mt-4 text-center space-y-1">
+
+          {mode !== "forgot_password" && (
+            <div className="mt-6 text-sm text-center">
+              {mode === "login" ? (
+                <p className="text-gray-600">
+                  No account?{" "}
+                  <button type="button" onClick={() => setMode("register")} className="text-sss-navy font-bold hover:underline">
+                    Sign up
+                  </button>
+                </p>
+              ) : (
+                <p className="text-gray-600">
+                  Have an account?{" "}
+                  <button type="button" onClick={() => setMode("login")} className="text-sss-navy font-bold hover:underline">
+                    Log in
+                  </button>
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="text-xs text-muted-foreground mt-6 text-center space-y-1">
             <p>By continuing, you agree to our</p>
             <p>
               <a href="https://www.sss.gov.ph/terms-of-service/" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground">Terms of Service</a>
