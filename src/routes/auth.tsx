@@ -21,7 +21,18 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+
+  const isLengthValid = password.length >= 8;
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSymbol = /[^A-Za-z0-9]/.test(password);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -38,24 +49,8 @@ function AuthPage() {
     }
 
     if (mode !== "forgot_password") {
-      if (password.length < 8) {
-        toast.error("Password must be at least 8 characters long.");
-        return;
-      }
-      if (!/[a-z]/.test(password)) {
-        toast.error("Password must contain at least one lowercase letter.");
-        return;
-      }
-      if (!/[A-Z]/.test(password)) {
-        toast.error("Password must contain at least one uppercase letter.");
-        return;
-      }
-      if (!/[0-9]/.test(password)) {
-        toast.error("Password must contain at least one number.");
-        return;
-      }
-      if (!/[^A-Za-z0-9]/.test(password)) {
-        toast.error("Password must contain at least one symbol.");
+      if (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSymbol) {
+        toast.error("Please ensure your password meets all requirements.");
         return;
       }
     }
@@ -74,7 +69,15 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+          options: { 
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              phone: phone,
+              birthdate: birthdate
+            }
+          },
         });
         
         if (error) throw error;
@@ -84,6 +87,10 @@ function AuthPage() {
         );
         setEmail("");
         setPassword("");
+        setFirstName("");
+        setLastName("");
+        setPhone("");
+        setBirthdate("");
         setMode("login");
       } else if (mode === "forgot_password") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -116,7 +123,7 @@ function AuthPage() {
     <div className="min-h-screen flex flex-col">
       <SssHeader />
       <main className="flex-1 flex items-start justify-center px-4 py-10">
-        <div className="w-full max-w-md">
+        <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-all duration-300`}>
           <div className="sss-section-header">
             {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Member Sign In" : "Create Member Account"}
           </div>
@@ -126,14 +133,14 @@ function AuthPage() {
                 <button
                   type="button"
                   onClick={() => setMode("login")}
-                  className={`flex-1 py-2 border ${mode === "login" ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border"}`}
+                  className={`flex-1 py-2 border rounded-md transition-colors ${mode === "login" ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border"}`}
                 >
                   Sign In
                 </button>
                 <button
                   type="button"
                   onClick={() => setMode("register")}
-                  className={`flex-1 py-2 border ${mode === "register" ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border"}`}
+                  className={`flex-1 py-2 border rounded-md transition-colors ${mode === "register" ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border"}`}
                 >
                   Register
                 </button>
@@ -147,76 +154,158 @@ function AuthPage() {
             )}
 
             <form onSubmit={onSubmit} className="space-y-4">
-              <div>
-                <label className="sss-label">Email Address</label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    className="w-full border border-sss-form-border bg-white pl-3 pr-10 py-2 text-sm font-sans normal-case tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  {email && (
-                    <button
-                      type="button"
-                      onClick={() => setEmail("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
+              {mode === "register" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="sss-label">First Name</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full border border-sss-form-border rounded-md bg-white px-3 py-2 text-sm font-sans tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="sss-label">Last Name</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full border border-sss-form-border rounded-md bg-white px-3 py-2 text-sm font-sans tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              {mode !== "forgot_password" && (
+              )}
+
+              <div className={mode === "register" ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : ""}>
                 <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="sss-label !mb-0">Password</label>
-                    {mode === "login" && (
+                  <label className="sss-label">Email Address</label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      className="w-full border border-sss-form-border rounded-md bg-white pl-3 pr-10 py-2 text-sm font-sans tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    {email && (
                       <button
                         type="button"
-                        onClick={() => setMode("forgot_password")}
-                        className="text-xs text-sss-navy hover:underline"
+                        onClick={() => setEmail("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
-                        Forgot Password?
+                        <X className="w-4 h-4" />
                       </button>
                     )}
                   </div>
-                  <div className="relative">
+                </div>
+                {mode === "register" && (
+                  <div>
+                    <label className="sss-label">Phone Number</label>
                     <input
-                      type={showPassword ? "text" : "password"}
+                      type="tel"
                       required
-                      minLength={8}
-                      className="w-full border border-sss-form-border bg-white pl-3 pr-16 py-2 text-sm font-sans normal-case tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full border border-sss-form-border rounded-md bg-white px-3 py-2 text-sm font-sans tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-muted-foreground">
-                      {password && (
+                  </div>
+                )}
+              </div>
+              
+              {mode !== "forgot_password" && (
+                <div className={mode === "register" ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : ""}>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="sss-label !mb-0">Password</label>
+                      {mode === "login" && (
                         <button
                           type="button"
-                          onClick={() => setPassword("")}
-                          className="hover:text-foreground"
+                          onClick={() => setMode("forgot_password")}
+                          className="text-xs text-sss-navy hover:underline"
                         >
-                          <X className="w-4 h-4" />
+                          Forgot Password?
                         </button>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="hover:text-foreground"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        minLength={8}
+                        className="w-full border border-sss-form-border rounded-md bg-white pl-3 pr-16 py-2 text-sm font-sans tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onFocus={() => setIsPasswordFocused(true)}
+                        onBlur={() => setIsPasswordFocused(false)}
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-muted-foreground">
+                        {password && (
+                          <button
+                            type="button"
+                            onClick={() => setPassword("")}
+                            className="hover:text-foreground"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="hover:text-foreground"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      
+                      {/* Password Requirements Popover */}
+                      {mode !== "forgot_password" && (isPasswordFocused || (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSymbol)) && password.length > 0 && (
+                        <div className="absolute top-full left-0 mt-2 w-full sm:w-[280px] bg-white border border-gray-200 shadow-xl rounded-md p-4 z-50 text-xs">
+                          <div className="absolute -top-1.5 left-6 w-3 h-3 bg-white border-t border-l border-gray-200 rotate-45"></div>
+                          <div className="relative z-10">
+                            <p className="font-semibold text-gray-500 mb-2 tracking-wide text-[10px] uppercase">Password Must</p>
+                            <ul className="space-y-1.5">
+                              <li className={`flex items-center gap-2 ${isLengthValid ? "text-green-600" : "text-gray-600"}`}>
+                                <span className="w-3 text-center">{isLengthValid ? "✓" : "•"}</span> Be at least 8 characters
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasUppercase ? "text-green-600" : "text-gray-600"}`}>
+                                <span className="w-3 text-center">{hasUppercase ? "✓" : "•"}</span> Contain at least one uppercase letter
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasLowercase ? "text-green-600" : "text-gray-600"}`}>
+                                <span className="w-3 text-center">{hasLowercase ? "✓" : "•"}</span> Contain at least one lowercase letter
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasNumber ? "text-green-600" : "text-gray-600"}`}>
+                                <span className="w-3 text-center">{hasNumber ? "✓" : "•"}</span> Contain at least one number
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasSymbol ? "text-green-600" : "text-gray-600"}`}>
+                                <span className="w-3 text-center">{hasSymbol ? "✓" : "•"}</span> Contain at least one symbol
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
+                  {mode === "register" && (
+                    <div>
+                      <label className="sss-label mb-1">Birthdate</label>
+                      <input
+                        type="date"
+                        required
+                        className="w-full border border-sss-form-border rounded-md bg-white px-3 py-2 text-sm font-sans tracking-normal focus:outline-2 focus:outline-sss-navy focus:outline-offset-[-1px]"
+                        value={birthdate}
+                        onChange={(e) => setBirthdate(e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
               <button
                 disabled={loading}
-                className="w-full py-2.5 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase hover:bg-sss-navy-dark disabled:opacity-60"
+                className="w-full py-2.5 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase rounded-md hover:bg-sss-navy-dark disabled:opacity-60 transition-colors"
               >
                 {loading ? "Please wait…" : mode === "forgot_password" ? "Send Reset Link" : mode === "login" ? "Sign In" : "Create Account"}
               </button>

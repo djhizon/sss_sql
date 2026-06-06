@@ -106,12 +106,16 @@
   text-transform: uppercase;
   color: var(--sss-label);
   text-align: center;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
 @utility sss-section-body {
   border: 1px solid var(--sss-form-border);
   padding: 0.75rem;
   background-color: var(--sss-form-bg);
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 @utility sss-label {
