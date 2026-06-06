@@ -498,13 +498,13 @@ function ApplyPage() {
               <button
                 type="button"
                 onClick={() => navigate({ to: "/dashboard" })}
-                className="px-6 py-2.5 bg-gray-200 text-gray-700 text-sm uppercase font-bold tracking-wider hover:bg-gray-300 transition-colors"
+                className="px-6 py-2.5 bg-gray-200 text-gray-700 text-sm uppercase font-bold tracking-wider hover:bg-gray-300 transition-colors rounded-md"
               >
                 Cancel
               </button>
               <button
                 disabled={busy}
-                className="px-8 py-2.5 bg-sss-navy text-white text-sm uppercase font-bold tracking-wider hover:bg-sss-navy-dark transition-colors disabled:opacity-60 flex items-center shadow-sm"
+                className="px-8 py-2.5 bg-sss-navy text-white text-sm uppercase font-bold tracking-wider hover:bg-sss-navy-dark transition-colors disabled:opacity-60 flex items-center shadow-sm rounded-md"
               >
                 {busy && (
                   <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
