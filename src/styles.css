@@ -81,6 +81,11 @@
   --primary-foreground: oklch(0.15 0.02 250);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
+
+  /* Dark mode overrides for SSS tokens */
+  --sss-section-bg: oklch(0.22 0.03 250);
+  --sss-label: oklch(0.85 0 0);
+  --sss-form-border: oklch(1 0 0 / 12%);
 }
 
 @layer base {

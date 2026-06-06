@@ -134,8 +134,8 @@ function SettingsPage() {
                     onClick={() => setActiveTab(tab.id as TabId)}
                     className={`relative flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors text-left z-10
                       ${isActive 
-                        ? "text-sss-navy font-bold" 
-                        : "text-gray-600 hover:text-gray-900"
+                        ? "text-primary font-bold" 
+                        : "text-muted-foreground hover:text-foreground"
                       }
                     `}
                   >
@@ -167,20 +167,20 @@ function SettingsPage() {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 max-w-2xl">
                     <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">First Name</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.first_name || "—"}</div>
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 block">First Name</label>
+                      <div className="text-sm font-medium text-foreground">{user?.user_metadata?.first_name || "—"}</div>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Last Name</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.last_name || "—"}</div>
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 block">Last Name</label>
+                      <div className="text-sm font-medium text-foreground">{user?.user_metadata?.last_name || "—"}</div>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Birthdate</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.birthdate ? new Date(user.user_metadata.birthdate).toLocaleDateString() : "—"}</div>
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 block">Birthdate</label>
+                      <div className="text-sm font-medium text-foreground">{user?.user_metadata?.birthdate ? new Date(user.user_metadata.birthdate).toLocaleDateString() : "—"}</div>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone Number</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.phone || "—"}</div>
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 block">Phone Number</label>
+                      <div className="text-sm font-medium text-foreground">{user?.user_metadata?.phone || "—"}</div>
                     </div>
                   </div>
                 </div>
@@ -201,7 +201,7 @@ function SettingsPage() {
                       <input
                         type="email"
                         required
-                        className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-sss-navy rounded-md"
+                        className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-2 focus:outline-primary rounded-md"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -231,7 +231,7 @@ function SettingsPage() {
                       <input
                         type="password"
                         required
-                        className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-sss-navy rounded-md"
+                        className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-2 focus:outline-primary rounded-md"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
@@ -241,7 +241,7 @@ function SettingsPage() {
                       <input
                         type="password"
                         required
-                        className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-sss-navy rounded-md"
+                        className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-2 focus:outline-primary rounded-md"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
@@ -296,7 +296,7 @@ function SettingsPage() {
                       await supabase.auth.signOut();
                       window.location.href = "/auth";
                     }}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 border border-border rounded-md text-foreground text-sm font-semibold hover:bg-muted transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out Securely
