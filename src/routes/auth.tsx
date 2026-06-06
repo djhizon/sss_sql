@@ -137,8 +137,9 @@ function AuthPage() {
             className="w-full flex justify-center items-start"
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            style={{ willChange: "transform" }}
           >
-            <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-all duration-300 shadow-2xl rounded-lg overflow-hidden`}>
+            <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-[max-width] duration-300 shadow-2xl rounded-lg overflow-hidden`}>
               
               {/* Dark Navy Header */}
               <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
