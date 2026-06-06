@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
 import { listMyApplications, checkIsAdmin } from "@/lib/applications.functions";
+import { formatName } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "My Applications — SSS Portal" }] }),
@@ -76,7 +77,7 @@ function Dashboard() {
                 {apps.map((a) => (
                   <tr key={a.app_number} className="border-t">
                     <td className="px-3 py-2 font-mono">{a.app_number}</td>
-                    <td className="px-3 py-2">{a.applicant_name}</td>
+                    <td className="px-3 py-2">{formatName(a.applicant_name)}</td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {new Date(a.created_at).toLocaleDateString()}
                     </td>

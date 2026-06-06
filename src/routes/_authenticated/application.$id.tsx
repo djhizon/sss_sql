@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
 import { getApplication, checkIsAdmin } from "@/lib/applications.functions";
+import { formatName } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/application/$id")({
   head: () => ({ meta: [{ title: "Application — SSS Portal" }] }),
@@ -76,7 +77,7 @@ function ViewApp() {
               <Row label="CRN" value={app.ap_crn} />
               <Row label="Date of Birth" value={app.ap_dob} />
               <Row label="Taxpayer ID" value={app.ap_taxpayer_id_number} />
-              <Row label="Name" value={app.applicant_name} />
+              <Row label="Name" value={formatName(app.applicant_name)} />
               <Row label="Sex" value={app.ap_sex} />
               <Row label="Civil Status" value={app.ap_civil_status} />
               <Row label="Local Address" value={app.ap_local_address} />
@@ -93,7 +94,7 @@ function ViewApp() {
               <Row label="CRN" value={app.sp_crn} />
               <Row label="Date of Birth" value={app.sp_dob} />
               <Row label="Taxpayer ID" value={app.sp_taxpayerid} />
-              <Row label="Spouse Name" value={app.spouse_name} />
+              <Row label="Spouse Name" value={formatName(app.spouse_name)} />
               <Row label="Employer Number" value={app.sp_employernum} />
               <Row label="Employer Tax ID" value={app.sp_employertaxid} />
               <Row label="Type of Employer" value={app.sp_typeofemployer} />

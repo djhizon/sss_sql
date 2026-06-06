@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { Check, X, Search } from "lucide-react";
 import { ClearableInput } from "@/components/SplitInputs";
+import { formatName } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — SSS Portal" }] }),
@@ -177,7 +178,7 @@ function AdminPage() {
                         className={`border-t cursor-pointer hover:bg-muted ${selected === r.app_number ? "bg-accent" : ""}`}
                       >
                         <td className="px-2 py-1.5 font-mono">{r.app_number}</td>
-                        <td className="px-2 py-1.5">{r.applicant_name}</td>
+                        <td className="px-2 py-1.5">{formatName(r.applicant_name)}</td>
                         <td className="px-2 py-1.5 uppercase text-xs">{r.status}</td>
                       </tr>
                     ))}
@@ -196,7 +197,7 @@ function AdminPage() {
                 <p className="text-sm">Loading…</p>
               ) : (
                 <div className="space-y-2 text-sm">
-                  <div className="font-bold">{detail.applicant_name}</div>
+                  <div className="font-bold">{formatName(detail.applicant_name)}</div>
                   <div className="text-xs text-muted-foreground">
                     SS#: {detail.ap_ss_num} · DOB: {detail.ap_dob}
                   </div>
