@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, User, Mail, Shield } from "lucide-react";
+import { LogOut, User, Mail, Shield, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
 import { useQuery } from "@tanstack/react-query";
@@ -18,13 +18,16 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type TabId = "personal" | "email" | "actions";
+type TabId = "personal" | "email" | "password" | "actions";
 
 function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("personal");
   const [email, setEmail] = useState("");
   const [currentEmail, setCurrentEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loadingPassword, setLoadingPassword] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   const { data: adminData } = useQuery({
@@ -63,9 +66,35 @@ function SettingsPage() {
     }
   }
 
+  async function handleUpdatePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password should be at least 6 characters.");
+      return;
+    }
+    
+    setLoadingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      toast.success("Your password has been updated successfully.");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update password.");
+    } finally {
+      setLoadingPassword(false);
+    }
+  }
+
   const tabs = [
     { id: "personal", label: "Personal Information", icon: <User className="w-4 h-4" /> },
     { id: "email", label: "Change Email", icon: <Mail className="w-4 h-4" /> },
+    { id: "password", label: "Change Password", icon: <Lock className="w-4 h-4" /> },
     { id: "actions", label: "Account Actions", icon: <Shield className="w-4 h-4" /> },
   ] as const;
 
@@ -165,6 +194,46 @@ function SettingsPage() {
                       className="w-full py-2 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase hover:bg-sss-navy-dark disabled:opacity-50 rounded-md"
                     >
                       {loading ? "Updating..." : "Update Email"}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "password" && (
+              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
+                <div className="sss-section-header rounded-t-md">Change Password</div>
+                <div className="p-6">
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Ensure your account is using a long, random password to stay secure.
+                  </p>
+                  
+                  <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-sm">
+                    <div>
+                      <label className="sss-label">New Password</label>
+                      <input
+                        type="password"
+                        required
+                        className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-sss-navy rounded-md"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="sss-label">Confirm New Password</label>
+                      <input
+                        type="password"
+                        required
+                        className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-sss-navy rounded-md"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      disabled={loadingPassword || !password || !confirmPassword}
+                      className="w-full py-2 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase hover:bg-sss-navy-dark disabled:opacity-50 rounded-md"
+                    >
+                      {loadingPassword ? "Updating..." : "Update Password"}
                     </button>
                   </form>
                 </div>
