@@ -136,8 +136,8 @@ function AuthPage() {
             
             {/* Dark Navy Header */}
             <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded shadow-sm">
-                <img src="/sss_logo.png" alt="SSS Logo" className="w-full h-full object-contain" />
+              <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-full shadow-md bg-white border-[3px] border-white">
+                <img src="/sss_logo.png" alt="SSS Logo" className="w-full h-full object-cover object-center scale-[1.05]" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
                 {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Sign in to Portal" : "Create Account"}

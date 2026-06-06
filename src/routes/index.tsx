@@ -15,7 +15,9 @@ function LandingHeader() {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/sss_logo.png" alt="SSS Logo" className="w-12 h-12 object-contain" />
+          <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-white shadow-sm border-[2px] border-white">
+            <img src="/sss_logo.png" alt="SSS Logo" className="w-full h-full object-cover object-center scale-[1.05]" />
+          </div>
           <div className="flex flex-col">
             <span className="text-[#1a365d] font-bold text-lg leading-tight">Social Security System</span>
             <span className="text-[#e09f3e] text-xs font-bold uppercase tracking-wider">Member Portal</span>
