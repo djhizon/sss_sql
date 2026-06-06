@@ -127,7 +127,7 @@ function AuthPage() {
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/sss_bg.png')" }}
       >
-        <div className="absolute inset-0 bg-[#1a365d]/60 backdrop-blur-md"></div>
+        <div className="absolute inset-0 bg-[#1a365d]/70 backdrop-blur-md"></div>
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
