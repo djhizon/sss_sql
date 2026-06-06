@@ -89,7 +89,7 @@ function UpdatePasswordPage() {
                     type={showPassword ? "text" : "password"}
                     required
                     minLength={8}
-                    className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm font-sans normal-case tracking-normal focus:outline-2 focus:outline-sss-navy rounded-md"
+                    className="sss-input pr-10 font-sans normal-case tracking-normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -109,7 +109,7 @@ function UpdatePasswordPage() {
                     type={showPassword ? "text" : "password"}
                     required
                     minLength={8}
-                    className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm font-sans normal-case tracking-normal focus:outline-2 focus:outline-sss-navy rounded-md"
+                    className="sss-input pr-10 font-sans normal-case tracking-normal"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
