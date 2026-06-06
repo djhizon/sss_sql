@@ -133,18 +133,19 @@ function AuthPage() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <SssHeader />
         <main className="flex-1 flex items-start justify-center px-4 py-10 mt-8">
-          <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-all duration-300 shadow-2xl rounded-lg overflow-hidden`}>
-            
-            {/* Dark Navy Header */}
-            <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
-              <motion.div 
-                className="w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-full shadow-md bg-white border-[3px] border-white"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <img src="/sss_square_logo.png" alt="SSS Logo" className="w-full h-full object-cover object-center scale-[1.05]" />
-              </motion.div>
-              <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
+          <motion.div 
+            className="w-full flex justify-center items-start"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-all duration-300 shadow-2xl rounded-lg overflow-hidden`}>
+              
+              {/* Dark Navy Header */}
+              <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
+                <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-full shadow-md bg-white border-[3px] border-white">
+                  <img src="/sss_square_logo.png" alt="SSS Logo" className="w-full h-full object-cover object-center scale-[1.05]" />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
                 {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Sign in to Portal" : "Create Account"}
               </h2>
               <p className="text-[#a0b2c6] text-xs">
@@ -373,7 +374,8 @@ function AuthPage() {
               </div>
             )}
             
-          </div>
+            </div>
+          </motion.div>
         </main>
         
         {/* Footer info below the card */}
