@@ -6,6 +6,7 @@ import { LogOut, User, Mail, Shield } from "lucide-react";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
 import { useQuery } from "@tanstack/react-query";
 import { checkIsAdmin } from "@/lib/applications.functions";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -63,122 +64,138 @@ function SettingsPage() {
   }
 
   const tabs = [
-    { id: "personal", label: "Personal Information", icon: <User className="w-4 h-4" /> },
-    { id: "email", label: "Change Email", icon: <Mail className="w-4 h-4" /> },
-    { id: "actions", label: "Account Actions", icon: <Shield className="w-4 h-4" /> },
+    { id: "personal", label: "Personal Information", count: null },
+    { id: "email", label: "Change Email", count: null },
+    { id: "actions", label: "Account Actions", count: null },
   ] as const;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50/50">
+    <div className="min-h-screen flex flex-col bg-[#f4f6f9]">
       <SssHeader user={user} isAdmin={adminData?.isAdmin} />
       
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-        <h1 className="text-2xl font-bold text-sss-navy-dark tracking-tight mb-6">Account Settings</h1>
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8 overflow-hidden">
+        <h1 className="text-2xl font-bold text-[#1a365d] tracking-tight mb-8">Account Settings</h1>
         
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          {/* Sidebar */}
-          <div className="w-full md:w-64 shrink-0 bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm">
-            <nav className="flex flex-col">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as TabId)}
-                  className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors text-left
-                    ${activeTab === tab.id 
-                      ? "bg-blue-50 text-sss-navy border-l-4 border-sss-navy" 
-                      : "text-gray-600 hover:bg-gray-50 border-l-4 border-transparent"
-                    }
-                  `}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
+        <div className="flex flex-col">
+          {/* Horizontal Tab Header matching the reference image */}
+          <div className="flex items-center gap-1 mb-6 border-b border-gray-200">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as TabId)}
+                className={`relative px-5 py-3 text-sm font-bold transition-colors rounded-t-lg
+                  ${activeTab === tab.id 
+                    ? "bg-white text-[#1a365d]" 
+                    : "text-gray-500 hover:text-gray-700 bg-transparent"
+                  }
+                `}
+              >
+                {tab.label}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="activeTabIndicator"
+                    className="absolute bottom-0 left-0 right-0 h-1 bg-[#e09f3e]"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </button>
+            ))}
           </div>
 
-          {/* Content Area */}
-          <div className="flex-1 w-full">
-            {activeTab === "personal" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
-                <div className="sss-section-header rounded-t-md">Personal Information</div>
-                <div className="p-6">
-                  <p className="text-sm text-muted-foreground mb-6">
-                    These are the details you provided when registering for your SSS account.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 max-w-2xl">
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">First Name</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.first_name || "—"}</div>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Last Name</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.last_name || "—"}</div>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Birthdate</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.birthdate ? new Date(user.user_metadata.birthdate).toLocaleDateString() : "—"}</div>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone Number</label>
-                      <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.phone || "—"}</div>
+          {/* Content Area with Slide Transition */}
+          <div className="relative min-h-[400px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="w-full"
+              >
+                {activeTab === "personal" && (
+                  <div className="bg-white border border-gray-200 rounded-b-md rounded-tr-md shadow-sm">
+                    <div className="bg-[#1a365d] text-white p-4 font-bold rounded-t-md">Personal Information</div>
+                    <div className="p-6">
+                      <p className="text-sm text-gray-500 mb-6">
+                        These are the details you provided when registering for your SSS account.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 max-w-2xl">
+                        <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">First Name</label>
+                          <div className="text-sm font-bold text-[#1a365d]">{user?.user_metadata?.first_name || "—"}</div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Last Name</label>
+                          <div className="text-sm font-bold text-[#1a365d]">{user?.user_metadata?.last_name || "—"}</div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Birthdate</label>
+                          <div className="text-sm font-bold text-[#1a365d]">{user?.user_metadata?.birthdate ? new Date(user.user_metadata.birthdate).toLocaleDateString() : "—"}</div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone Number</label>
+                          <div className="text-sm font-bold text-[#1a365d]">{user?.user_metadata?.phone || "—"}</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {activeTab === "email" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
-                <div className="sss-section-header rounded-t-md">Change Email</div>
-                <div className="p-6">
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Changing your email address will require you to verify the change via a secure link sent to both your old and new email inboxes.
-                  </p>
-                  
-                  <form onSubmit={handleUpdateEmail} className="space-y-4 max-w-sm">
-                    <div>
-                      <label className="sss-label">New Email Address</label>
-                      <input
-                        type="email"
-                        required
-                        className="w-full border border-sss-form-border bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-sss-navy rounded-md"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
+                {activeTab === "email" && (
+                  <div className="bg-white border border-gray-200 rounded-b-md rounded-tr-md shadow-sm">
+                    <div className="bg-[#1a365d] text-white p-4 font-bold rounded-t-md">Change Email</div>
+                    <div className="p-6">
+                      <p className="text-sm text-gray-500 mb-6">
+                        Changing your email address will require you to verify the change via a secure link sent to both your old and new email inboxes.
+                      </p>
+                      
+                      <form onSubmit={handleUpdateEmail} className="space-y-4 max-w-sm">
+                        <div>
+                          <label className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 block">New Email Address</label>
+                          <input
+                            type="email"
+                            required
+                            className="w-full border border-gray-300 rounded bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
+                        <button
+                          disabled={loading || email === currentEmail}
+                          className="w-full py-2.5 bg-[#e09f3e] text-white text-sm font-bold tracking-wide rounded hover:bg-[#c98e37] disabled:opacity-60 transition-colors shadow-sm"
+                        >
+                          {loading ? "Updating..." : "Update Email"}
+                        </button>
+                      </form>
                     </div>
-                    <button
-                      disabled={loading || email === currentEmail}
-                      className="w-full py-2 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase hover:bg-sss-navy-dark disabled:opacity-50 rounded-md"
-                    >
-                      {loading ? "Updating..." : "Update Email"}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
+                  </div>
+                )}
 
-            {activeTab === "actions" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
-                <div className="sss-section-header rounded-t-md">Account Actions</div>
-                <div className="p-6">
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Manage your current session and security.
-                  </p>
-                  <button
-                    onClick={async () => {
-                      await supabase.auth.signOut();
-                      window.location.href = "/auth";
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out Securely
-                  </button>
-                </div>
-              </div>
-            )}
+                {activeTab === "actions" && (
+                  <div className="bg-white border border-gray-200 rounded-b-md rounded-tr-md shadow-sm">
+                    <div className="bg-[#1a365d] text-white p-4 font-bold rounded-t-md">Account Actions</div>
+                    <div className="p-6">
+                      <p className="text-sm text-gray-500 mb-6">
+                        Manage your current session and security.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          await supabase.auth.signOut();
+                          window.location.href = "/auth";
+                        }}
+                        className="flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded text-[#1a365d] text-sm font-bold hover:bg-gray-50 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out Securely
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </main>
