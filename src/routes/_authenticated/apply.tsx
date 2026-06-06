@@ -452,30 +452,30 @@ function ApplyPage() {
               <Field label="Spouse Full Name" className="md:col-span-4">
                 <SplitName value={form.spouse_name || ""} onChange={(v) => set("spouse_name", v)} />
               </Field>
-              <Field label="Employer Number">
+              <Field label="Employer Number" className="md:col-span-4">
                 <DigitBoxes format="##-#######-#" value={form.sp_employernum || ""} onChange={(v) => set("sp_employernum", v)} />
               </Field>
-              <Field label="Employer Tax ID">
+              <Field label="Employer Tax ID" className="md:col-span-4">
                 <DigitBoxes format="###-###-###-###" value={form.sp_employertaxid || ""} onChange={(v) => set("sp_employertaxid", v)} />
               </Field>
-              <Field label="Type of Employer">
+              <Field label="Type of Employer" className="md:col-span-1">
                 <select className="sss-input" value={form.sp_typeofemployer} onChange={(e) => set("sp_typeofemployer", e.target.value as never)}>
                   <option value="">—</option>
                   <option value="B">Business</option>
                   <option value="H">Household</option>
                 </select>
               </Field>
-              <Field label="Employer Name">{input("sp_employername")}</Field>
+              <Field label="Employer Name" className="md:col-span-3">{input("sp_employername")}</Field>
             </div>
 
             <div className="bg-gray-100/80 text-sss-navy-dark text-xs font-bold uppercase py-1.5 px-4 border-y-2 border-sss-form-border tracking-wider">
               C. Principal Applicant's Employer Information
             </div>
             <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Field label="Employer Number" required className="md:col-span-2">
+              <Field label="Employer Number" required className="md:col-span-4">
                 <DigitBoxes format="##-#######-#" value={form.ap_employer_num || ""} onChange={(v) => set("ap_employer_num", v)} required />
               </Field>
-              <Field label="Taxpayer ID Number" required className="md:col-span-2">
+              <Field label="Taxpayer ID Number" required className="md:col-span-4">
                 <DigitBoxes format="###-###-###-###" value={form.ap_employer_taxid || ""} onChange={(v) => set("ap_employer_taxid", v)} required />
               </Field>
               <Field label="Type of Employer" required>
