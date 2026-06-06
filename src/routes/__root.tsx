@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 function NotFoundComponent() {
   return (
@@ -139,18 +140,20 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={router.state.location.pathname}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Outlet />
-        </motion.div>
-      </AnimatePresence>
-      <Toaster richColors position="top-right" />
+      <ThemeProvider defaultTheme="light" storageKey="sss-theme">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={router.state.location.pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
+        <Toaster richColors position="top-right" />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

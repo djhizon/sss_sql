@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, User, Mail, Shield, Lock } from "lucide-react";
+import { LogOut, User, Mail, Shield, Lock, Moon, Sun, Monitor } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/components/ThemeProvider";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
 import { useQuery } from "@tanstack/react-query";
 import { checkIsAdmin } from "@/lib/applications.functions";
@@ -18,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type TabId = "personal" | "email" | "password" | "actions";
+type TabId = "personal" | "email" | "password" | "appearance" | "actions";
 
 function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("personal");
@@ -29,6 +31,8 @@ function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loadingPassword, setLoadingPassword] = useState(false);
   const [user, setUser] = useState<any>(null);
+  
+  const { theme, setTheme } = useTheme();
 
   const { data: adminData } = useQuery({
     queryKey: ["is-admin"],
@@ -107,19 +111,20 @@ function SettingsPage() {
     { id: "personal", label: "Personal Information", icon: <User className="w-4 h-4" /> },
     { id: "email", label: "Change Email", icon: <Mail className="w-4 h-4" /> },
     { id: "password", label: "Change Password", icon: <Lock className="w-4 h-4" /> },
+    { id: "appearance", label: "Appearance", icon: <Moon className="w-4 h-4" /> },
     { id: "actions", label: "Account Actions", icon: <Shield className="w-4 h-4" /> },
   ] as const;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50/50">
+    <div className="min-h-screen flex flex-col bg-muted/50">
       <SssHeader user={user} isAdmin={adminData?.isAdmin} />
       
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-        <h1 className="text-2xl font-bold text-sss-navy-dark tracking-tight mb-6">Account Settings</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight mb-6">Account Settings</h1>
         
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Sidebar */}
-          <div className="w-full md:w-64 shrink-0 bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm">
+          <div className="w-full md:w-64 shrink-0 bg-card border border-border rounded-md overflow-hidden shadow-sm">
             <nav className="flex flex-col relative">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
@@ -153,7 +158,7 @@ function SettingsPage() {
           {/* Content Area */}
           <div className="flex-1 w-full">
             {activeTab === "personal" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
+              <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
                 <div className="sss-section-header rounded-t-md">Personal Information</div>
                 <div className="p-6">
                   <p className="text-sm text-muted-foreground mb-6">
@@ -183,7 +188,7 @@ function SettingsPage() {
             )}
 
             {activeTab === "email" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
+              <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
                 <div className="sss-section-header rounded-t-md">Change Email</div>
                 <div className="p-6">
                   <p className="text-sm text-muted-foreground mb-6">
@@ -213,7 +218,7 @@ function SettingsPage() {
             )}
 
             {activeTab === "password" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
+              <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
                 <div className="sss-section-header rounded-t-md">Change Password</div>
                 <div className="p-6">
                   <p className="text-sm text-muted-foreground mb-6">
@@ -252,8 +257,35 @@ function SettingsPage() {
               </div>
             )}
 
+            {activeTab === "appearance" && (
+              <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
+                <div className="sss-section-header rounded-t-md">Appearance Settings</div>
+                <div className="p-6 space-y-6">
+                  <p className="text-sm text-muted-foreground">
+                    Customize how the SSS Member Portal looks on your device.
+                  </p>
+                  
+                  <div className="flex items-center justify-between py-4 border-t border-border">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-muted rounded-md text-primary">
+                        {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold">Dark Mode</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Switch to a dark, high-contrast theme</p>
+                      </div>
+                    </div>
+                    <Switch 
+                      checked={theme === "dark"} 
+                      onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === "actions" && (
-              <div className="bg-white border border-gray-200 rounded-md shadow-sm">
+              <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
                 <div className="sss-section-header rounded-t-md">Account Actions</div>
                 <div className="p-6">
                   <p className="text-sm text-muted-foreground mb-6">
