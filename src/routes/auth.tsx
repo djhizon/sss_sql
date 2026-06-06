@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
 import { toast } from "sonner";
 import { Eye, EyeOff, X } from "lucide-react";
+import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -136,9 +137,13 @@ function AuthPage() {
             
             {/* Dark Navy Header */}
             <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
-              <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-full shadow-md bg-white border-[3px] border-white">
+              <motion.div 
+                className="w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-full shadow-md bg-white border-[3px] border-white"
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              >
                 <img src="/sss_square_logo.png" alt="SSS Logo" className="w-full h-full object-cover object-center scale-[1.05]" />
-              </div>
+              </motion.div>
               <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
                 {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Sign in to Portal" : "Create Account"}
               </h2>
