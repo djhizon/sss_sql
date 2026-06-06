@@ -1,0 +1,4 @@
+{
+  "name": "sss",
+  "buildCommand": "npm run build"
+}
