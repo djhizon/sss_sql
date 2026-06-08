@@ -30,7 +30,7 @@ Welcome to the **SSS SQL** codebase! This document provides a high-level overvie
 +------------------------+------------------------+
 |                SUPABASE PLATFORM                |
 |                                                 |
-|  [ Auth System ]       [ Postgres Database ]    |
+|  [ Auth System ]       [ PostgresSQL Database ]    |
 |  (users, sessions)     (applications table)     |
 |                                                 |
 |             [ Edge RPC Functions ]              |

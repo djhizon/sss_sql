@@ -115,35 +115,8 @@ function AdminPage() {
     <div className="min-h-screen flex flex-col">
       <SssHeader user={user} isAdmin />
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
-        <h2 className="text-xl font-bold text-sss-navy-dark mb-3">Admin — Application Queue</h2>
-
-        <div className="flex flex-col md:flex-row gap-4 mb-4 justify-between items-start md:items-end">
-          <div className="flex gap-2 text-xs uppercase font-bold tracking-wider">
-            {(["all", "pending", "approved", "rejected"] as StatusFilter[]).map((s) => {
-              const isActive = status === s;
-              let colorClass = "";
-              if (isActive) {
-                if (s === "pending") colorClass = "bg-accent text-accent-foreground border-sss-gold";
-                else if (s === "approved") colorClass = "bg-emerald-100 text-emerald-900 border-emerald-700";
-                else if (s === "rejected") colorClass = "bg-red-100 text-red-900 border-red-700";
-                else colorClass = "bg-sss-navy text-white border-sss-navy";
-              } else {
-                if (s === "pending") colorClass = "text-amber-700 border-sss-form-border hover:bg-accent/20";
-                else if (s === "approved") colorClass = "text-emerald-700 border-sss-form-border hover:bg-emerald-50";
-                else if (s === "rejected") colorClass = "text-red-700 border-sss-form-border hover:bg-red-50";
-                else colorClass = "text-sss-navy border-sss-form-border hover:bg-sss-navy/10";
-              }
-              return (
-                <button
-                  key={s}
-                  onClick={() => setStatus(s)}
-                  className={`px-3 py-1.5 border rounded transition-colors ${colorClass}`}
-                >
-                  {s}
-                </button>
-              );
-            })}
-          </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+          <h2 className="text-xl font-bold text-sss-navy-dark">Admin — Application Queue</h2>
           
           <div className="flex gap-2 w-full md:w-auto">
             <div className="relative flex items-center w-full md:w-64">
@@ -166,6 +139,18 @@ function AdminPage() {
               <option value="alpha_desc">Alphabetical (Z-A)</option>
             </select>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 text-xs uppercase mb-4">
+          {(["pending", "approved", "rejected", "all"] as StatusFilter[]).map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatus(s)}
+              className={`px-3 py-1.5 border whitespace-nowrap transition-colors rounded-sm ${status === s ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border hover:bg-gray-50"}`}
+            >
+              {s}
+            </button>
+          ))}
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
