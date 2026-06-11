@@ -194,7 +194,7 @@ function SettingsPage() {
                   <p className="text-sm text-muted-foreground mb-6">
                     <strong>Note on Security:</strong> Supabase requires "Secure Email Change" by default. This means when you update your email, you will first receive an email at your <strong>CURRENT</strong> address. You must click the link in that email to authorize the change. Only after that will a final confirmation be sent to your <strong>NEW</strong> email address. 
                     <br/><br/>
-                    Also, if the verification email says "Confirm your Registration" instead of "Confirm Email Change", you need to update the "Change Email Address" template text in your Supabase Dashboard -> Authentication -> Email Templates.
+                    Also, if the verification email says "Confirm your Registration" instead of "Confirm Email Change", you need to update the "Change Email Address" template text in your Supabase Dashboard to Authentication to Email Templates.
                   </p>
                   
                   <form onSubmit={handleUpdateEmail} className="space-y-4 max-w-sm">
