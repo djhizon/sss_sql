@@ -25,7 +25,7 @@ export function SssHeader({ user, isAdmin }: Props) {
       {/* Top navy band */}
       <div className="bg-sss-navy-dark text-white text-xs">
         <div className="max-w-6xl mx-auto px-4 py-1.5 flex justify-between items-center">
-          <span className="opacity-90">Republic of the Philippines</span>
+          <span className="opacity-90">GOV.PH</span>
           <div className="flex gap-4 items-center">
             {user ? (
               <>
@@ -51,7 +51,7 @@ export function SssHeader({ user, isAdmin }: Props) {
       {/* Main brand band */}
       <div className="bg-sss-navy text-white relative">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
-          <img src={sssLogo} alt="SSS seal" className="h-14 w-14 bg-white rounded-sm p-1" />
+          <img src={sssLogo} alt="SSS seal" className="h-14 w-14 drop-shadow-[0_0_4px_rgba(255,255,255,0.6)]" />
           <div className="flex-1">
             <div className="text-[10px] tracking-widest uppercase opacity-80">
               Republic of the Philippines
@@ -147,43 +147,7 @@ export function SssHeader({ user, isAdmin }: Props) {
         )}
       </div>
 
-      {/* Main Tab Navigation Band */}
-      {user && (
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-4 flex gap-1 pt-3">
-            {[
-              { to: "/dashboard", label: "My Applications" },
-              { to: "/apply", label: "Apply" },
-              ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
-              { to: "/settings", label: "Settings" }
-            ].map((link) => {
-              const isActive = location.pathname.startsWith(link.to);
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`relative px-5 py-3 text-sm font-bold transition-colors rounded-t-lg
-                    ${isActive 
-                      ? "bg-white text-[#1a365d]" 
-                      : "text-gray-500 hover:text-gray-700 bg-transparent"
-                    }
-                  `}
-                >
-                  {link.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="mainNavIndicator"
-                      className="absolute bottom-0 left-0 right-0 h-1 bg-[#e09f3e]"
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
+
     </header>
   );
 }

@@ -322,35 +322,36 @@ function ApplyPage() {
             <button
               type="button"
               onClick={handlePrefill}
-              className="px-5 py-2.5 bg-blue-100 text-blue-700 text-sm font-bold uppercase tracking-wide hover:bg-blue-200 border-2 border-blue-200 rounded shadow-sm text-center transition-colors active:scale-95"
+              className="px-5 py-2.5 bg-blue-50 text-blue-700 text-sm font-bold uppercase tracking-wide hover:bg-blue-100 border border-blue-200 rounded-md shadow-sm text-center transition-all active:scale-95 flex items-center gap-2"
             >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.707 14.707a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L8 12.586l6.293-6.293a1 1 0 011.414 1.414l-7 7z" /></svg>
               PREFILL WITH SYNTHETIC DATA
             </button>
           </div>
         )}
 
-        <div className="border-2 border-sss-form-border bg-white shadow-lg overflow-hidden">
-          <div className="text-center py-4 border-b-2 border-sss-form-border bg-gray-50/50">
-            <div className="text-xs text-sss-label">Republic of the Philippines</div>
-            <div className="text-base font-bold tracking-wide">SOCIAL SECURITY SYSTEM</div>
-            <div className="text-xl md:text-2xl font-extrabold tracking-wider mt-1 mb-1 text-sss-navy">APPLICATION FOR HOUSING LOAN</div>
-            <div className="text-[10px] text-sss-label">MEL-01750 (09-2022)</div>
+        <div className="border border-sss-form-border bg-white shadow-md rounded-xl overflow-hidden">
+          <div className="text-center py-6 border-b border-sss-form-border bg-gradient-to-b from-[#f8fafc] to-white">
+            <div className="text-xs text-sss-label font-semibold tracking-widest">REPUBLIC OF THE PHILIPPINES</div>
+            <div className="text-base font-bold tracking-widest text-gray-800">SOCIAL SECURITY SYSTEM</div>
+            <div className="text-xl md:text-2xl font-extrabold tracking-wider mt-2 mb-1 text-sss-navy">APPLICATION FOR HOUSING LOAN</div>
+            <div className="text-[10px] text-gray-400 font-medium">MEL-01750 (09-2022)</div>
             {mounted && (
-              <div className="text-sm font-bold mt-2 text-sss-navy-dark border border-sss-form-border inline-block px-3 py-1 rounded bg-white">
-                Application No: {nextAppNumber}
+              <div className="text-sm font-bold mt-4 text-sss-navy-dark border border-gray-200 inline-block px-4 py-1.5 rounded-md bg-white shadow-sm">
+                Application No: <span className="text-sss-navy tracking-widest">{nextAppNumber}</span>
               </div>
             )}
           </div>
 
           <form onSubmit={onSubmit}>
-            <div className="bg-sss-navy text-white text-sm font-bold uppercase py-2 px-4">
+            <div className="bg-sss-navy text-white text-sm font-bold uppercase py-3 px-6 tracking-widest shadow-inner">
               Part I — To Be Filled Out by Member-Applicant
             </div>
 
-            <div className="bg-gray-100/80 text-sss-navy-dark text-xs font-bold uppercase py-1.5 px-4 border-y-2 border-sss-form-border tracking-wider">
+            <div className="bg-sss-section-bg text-sss-navy-dark text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
               A. Principal Applicant's Information
             </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
               <Field label="SS Number" required className="md:col-span-4">
                 <DigitBoxes format="##-#######-#" value={form.ap_ss_num} onChange={(v) => set("ap_ss_num", v)} required />
               </Field>
@@ -432,10 +433,10 @@ function ApplyPage() {
               </Field>
             </div>
 
-            <div className="bg-gray-100/80 text-sss-navy-dark text-xs font-bold uppercase py-1.5 px-4 border-y-2 border-sss-form-border tracking-wider">
+            <div className="bg-sss-section-bg text-sss-navy-dark text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
               B. Spouse of Principal Applicant's Information (If Applicable)
             </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
               <Field label="SS Number" className="md:col-span-4 lg:col-span-2">
                 <DigitBoxes format="##-#######-#" value={form.sp_ss_num || ""} onChange={(v) => set("sp_ss_num", v)} />
               </Field>
@@ -468,10 +469,10 @@ function ApplyPage() {
               <Field label="Employer Name" className="md:col-span-4 lg:col-span-2">{input("sp_employername")}</Field>
             </div>
 
-            <div className="bg-gray-100/80 text-sss-navy-dark text-xs font-bold uppercase py-1.5 px-4 border-y-2 border-sss-form-border tracking-wider">
+            <div className="bg-sss-section-bg text-sss-navy-dark text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
               C. Principal Applicant's Employer Information
             </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
               <Field label="Employer Number" required className="md:col-span-4 lg:col-span-2">
                 <DigitBoxes format="##-#######-#" value={form.ap_employer_num || ""} onChange={(v) => set("ap_employer_num", v)} required />
               </Field>
@@ -494,7 +495,7 @@ function ApplyPage() {
               <Field label="Website">{input("ap_employer_website", { forceLowercase: true })}</Field>
             </div>
 
-            <div className="p-4 border-t-2 border-sss-form-border flex justify-end gap-3 bg-gray-50 mt-4">
+            <div className="p-6 border-t border-sss-form-border flex justify-end gap-3 bg-gray-50/80 mt-2 rounded-b-xl">
               <button
                 type="button"
                 onClick={() => navigate({ to: "/dashboard" })}

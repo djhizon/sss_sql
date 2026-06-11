@@ -67,7 +67,7 @@ export function DigitBoxes({ value, onChange, format, required }: DigitBoxesProp
           ref={(el) => { inputRefs.current[currentIdx] = el; }}
           type="text"
           maxLength={2} // Allow 2 to catch rapid typing and slice(-1)
-          className="w-6 sm:w-7 lg:w-8 h-8 sm:h-10 text-center border-2 border-sss-form-border text-base lg:text-lg font-bold uppercase focus:border-sss-navy focus:outline-none focus:ring-2 focus:ring-sss-navy/50 flex-shrink-0"
+          className="w-6 sm:w-7 lg:w-8 h-8 sm:h-10 text-center border border-gray-300 rounded-md shadow-sm text-base lg:text-lg font-bold uppercase focus:border-sss-navy focus:outline-none focus:ring-1 focus:ring-sss-navy/50 flex-shrink-0"
           value={digits[currentIdx] || ""}
           onChange={(e) => handleChange(e, currentIdx)}
           onKeyDown={(e) => handleKeyDown(e, currentIdx)}

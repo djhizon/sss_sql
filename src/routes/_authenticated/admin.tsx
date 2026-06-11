@@ -146,7 +146,7 @@ function AdminPage() {
             <button
               key={s}
               onClick={() => setStatus(s)}
-              className={`px-3 py-1.5 border whitespace-nowrap transition-colors rounded-sm ${status === s ? "bg-sss-navy text-white border-sss-navy" : "border-sss-form-border hover:bg-gray-50"}`}
+              className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0284c7] text-white border-[#0284c7]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
             >
               {s}
             </button>
@@ -154,32 +154,34 @@ function AdminPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <div className="sss-section-header">Applications</div>
-            <div className="sss-section-body p-0 max-h-[60vh] overflow-auto">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
+              Applications
+            </div>
+            <div className="p-0 max-h-[60vh] overflow-auto">
               {isLoading ? (
-                <div className="p-4 text-sm">Loading…</div>
+                <div className="p-6 text-sm text-center text-gray-500">Loading…</div>
               ) : filteredRows.length === 0 ? (
-                <div className="p-4 text-sm text-muted-foreground">No applications match your criteria.</div>
+                <div className="p-6 text-sm text-center text-gray-500">No applications match your criteria.</div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-sss-section-bg text-left">
+                  <thead className="bg-gray-50 border-b border-gray-200 text-left">
                     <tr>
-                      <th className="px-2 py-1.5 text-xs uppercase">#</th>
-                      <th className="px-2 py-1.5 text-xs uppercase">Applicant</th>
-                      <th className="px-2 py-1.5 text-xs uppercase">Status</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">#</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Applicant</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Status</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100">
                     {filteredRows.map((r) => (
                       <tr
                         key={r.app_number}
                         onClick={() => setSelected(r.app_number)}
-                        className={`border-t cursor-pointer hover:bg-muted ${selected === r.app_number ? "bg-accent" : ""}`}
+                        className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-blue-50/80" : "hover:bg-gray-50"}`}
                       >
-                        <td className="px-2 py-1.5 font-mono">{r.app_number}</td>
-                        <td className="px-2 py-1.5">{formatName(r.applicant_name)}</td>
-                        <td className="px-2 py-1.5 uppercase text-xs">
+                        <td className="px-4 py-3 font-mono text-gray-600">{r.app_number}</td>
+                        <td className="px-4 py-3 font-medium text-gray-800">{formatName(r.applicant_name)}</td>
+                        <td className="px-4 py-3 uppercase text-xs">
                           <span className={statusBadge(r.status)}>{r.status}</span>
                         </td>
                       </tr>
@@ -190,9 +192,11 @@ function AdminPage() {
             </div>
           </div>
 
-          <div>
-            <div className="sss-section-header">Review</div>
-            <div className="sss-section-body min-h-[60vh]">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
+              Review
+            </div>
+            <div className="p-6 flex-1 min-h-[60vh] flex flex-col">
               {!selected ? (
                 <p className="text-sm text-muted-foreground">Select an application on the left.</p>
               ) : !detail ? (
@@ -244,11 +248,11 @@ function AdminPage() {
                     </div>
                   )}
 
-                  <div className="pt-4 border-t mt-4 flex justify-end">
+                  <div className="pt-4 border-t border-gray-200 mt-auto flex justify-end">
                     <Link
                       to="/application/$id"
                       params={{ id: String(detail.app_number) }}
-                      className="text-xs uppercase font-bold tracking-widest text-sss-navy border border-sss-navy px-4 py-2 hover:bg-sss-navy hover:text-white transition-colors"
+                      className="text-xs uppercase font-bold tracking-widest text-[#0284c7] border border-[#0284c7] px-4 py-2 hover:bg-[#0284c7] hover:text-white transition-colors rounded-md shadow-sm"
                     >
                       View Full Application &rarr;
                     </Link>

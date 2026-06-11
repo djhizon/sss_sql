@@ -37,7 +37,7 @@
   --color-sss-section-bg: var(--sss-section-bg);
   --color-sss-label: var(--sss-label);
 
-  --font-form: "Arial", "Helvetica Neue", sans-serif;
+  --font-form: "Inter", "Roboto", "Helvetica Neue", sans-serif;
 }
 
 :root {
@@ -65,27 +65,28 @@
   /* SSS palette (approximated from sss.gov.ph) */
   --sss-navy: #0038a8; /* deep govt blue */
   --sss-navy-dark: #002878; /* darker band */
-  --sss-gold: #ffcc00; /* gold accent */
+  --sss-gold: #0284c7; /* replaced gold with a bright modern blue for accents */
   --sss-form-bg: #ffffff;
-  --sss-form-border: #4a4a4a; /* dark borders like scanned form */
-  --sss-section-bg: #eaeaea; /* grey section header bar */
-  --sss-label: #333333; /* uppercase label grey */
+  --sss-form-border: #e5e7eb; /* softened borders */
+  --sss-section-bg: #f8fafc; /* modern soft blue-gray section header bar */
+  --sss-label: #4b5563; /* softer uppercase label grey */
 }
 
 .dark {
-  --background: oklch(0.15 0.02 250);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.2 0.03 250);
-  --card-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.78 0.14 85);
-  --primary-foreground: oklch(0.15 0.02 250);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
+  --background: oklch(0.18 0.02 250);
+  --foreground: oklch(0.95 0.01 250);
+  --card: oklch(0.22 0.03 250);
+  --card-foreground: oklch(0.95 0.01 250);
+  --primary: oklch(0.65 0.15 250);
+  --primary-foreground: oklch(0.98 0 0);
+  --border: oklch(0.28 0.03 250);
+  --input: oklch(0.28 0.03 250);
 
   /* Dark mode overrides for SSS tokens */
-  --sss-section-bg: oklch(0.22 0.03 250);
-  --sss-label: oklch(0.85 0 0);
-  --sss-form-border: oklch(1 0 0 / 12%);
+  --sss-section-bg: oklch(0.25 0.03 250);
+  --sss-label: oklch(0.85 0.02 250);
+  --sss-form-border: oklch(0.3 0.03 250);
+  --sss-form-bg: oklch(0.2 0.03 250);
 }
 
 @layer base {
@@ -104,33 +105,33 @@
   background-color: var(--sss-section-bg);
   border: 1px solid var(--sss-form-border);
   border-bottom: none;
-  padding: 0.35rem 0.75rem;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--sss-label);
-  text-align: center;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
+  color: var(--sss-navy);
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
 }
 
 @utility sss-section-body {
   border: 1px solid var(--sss-form-border);
-  padding: 0.75rem;
+  padding: 1.25rem;
   background-color: var(--sss-form-bg);
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
 }
 
 @utility sss-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--sss-label);
   display: block;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.25rem;
 }
 
 @utility sss-hint {

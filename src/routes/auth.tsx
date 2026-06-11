@@ -29,6 +29,10 @@ function AuthPage() {
   const [phone, setPhone] = useState("");
   const [birthdate, setBirthdate] = useState("");
 
+  const capitalizeWords = (str: string) => {
+    return str.split(' ').map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '').join(' ');
+  };
+
   const isLengthValid = password.length >= 8;
   const hasLowercase = /[a-z]/.test(password);
   const hasUppercase = /[A-Z]/.test(password);
@@ -52,6 +56,12 @@ function AuthPage() {
     if (mode === "register") {
       if (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSymbol) {
         toast.error("Please ensure your password meets all requirements.");
+        return;
+      }
+      
+      const phoneClean = phone.replace(/\s+/g, '');
+      if (!/^(09|\+639|639)\d{9}$/.test(phoneClean)) {
+        toast.error("Please enter a valid Philippine mobile number (e.g., 09123456789 or +639123456789).");
         return;
       }
     }
@@ -143,16 +153,13 @@ function AuthPage() {
               
               {/* Dark Navy Header */}
               <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
-                <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center overflow-hidden rounded-full shadow-md bg-white border-[3px] border-white">
-                  <img src="/sss_square_logo.png" alt="SSS Logo" className="w-full h-full object-cover object-center scale-[1.05]" />
-                </div>
                 <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
-                {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Sign in to Portal" : "Create Account"}
-              </h2>
-              <p className="text-[#a0b2c6] text-xs">
-                Easily Access Your Records ONLINE!
-              </p>
-            </div>
+                  {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Sign In to Portal" : "Create Account"}
+                </h2>
+                <p className="text-[#a0b2c6] text-xs">
+                  Easily Access Your Records ONLINE!
+                </p>
+              </div>
 
             <div className="bg-white p-8">
               {mode === "forgot_password" && (
@@ -171,7 +178,7 @@ function AuthPage() {
                         required
                         className="sss-input font-sans normal-case tracking-normal"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(capitalizeWords(e.target.value))}
                         placeholder="Enter first name"
                       />
                     </div>
@@ -182,7 +189,7 @@ function AuthPage() {
                         required
                         className="sss-input font-sans normal-case tracking-normal"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(capitalizeWords(e.target.value))}
                         placeholder="Enter last name"
                       />
                     </div>
@@ -347,14 +354,14 @@ function AuthPage() {
                   <>
                     <div className="text-left">
                       <p className="font-bold text-gray-900 text-sm">New Portal user?</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Start here — enrollment only takes a few minutes.</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Start here — registration only takes a few minutes.</p>
                     </div>
                     <button 
                       type="button" 
                       onClick={() => setMode("register")} 
-                      className="shrink-0 px-5 py-2.5 bg-[#e09f3e] text-white text-sm font-bold rounded hover:bg-[#c98e37] transition-colors shadow-sm"
+                      className="shrink-0 px-5 py-2.5 bg-[#0284c7] text-white text-sm font-bold rounded-md hover:bg-[#0369a1] transition-all shadow-sm hover:shadow"
                     >
-                      + Enroll Now
+                      + Register Now
                     </button>
                   </>
                 ) : (

@@ -39,56 +39,63 @@ function Dashboard() {
           </div>
           <Link
             to="/apply"
-            className="px-4 py-2 bg-sss-navy text-white text-sm font-bold uppercase tracking-wide hover:bg-sss-navy-dark rounded"
+            className="px-5 py-2.5 bg-[#0284c7] text-white text-sm font-bold uppercase tracking-wide hover:bg-[#0369a1] rounded-md shadow-sm hover:shadow transition-all"
           >
             + New Application
           </Link>
         </div>
 
-        <div className="sss-section-header">Application History</div>
-        <div className="sss-section-body p-0">
-          {isLoading ? (
-            <div className="p-6 text-sm text-muted-foreground">Loading…</div>
-          ) : apps.length === 0 ? (
-            <div className="p-6 text-sm text-muted-foreground">
-              No applications yet. Click "New Application" to begin.
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-sss-section-bg">
-                <tr className="text-left">
-                  <th className="px-3 py-2 text-xs uppercase text-sss-label">App Number</th>
-                  <th className="px-3 py-2 text-xs uppercase text-sss-label">Applicant</th>
-                  <th className="px-3 py-2 text-xs uppercase text-sss-label">Submitted</th>
-                  <th className="px-3 py-2 text-xs uppercase text-sss-label">Status</th>
-                  <th className="px-3 py-2"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {apps.map((a) => (
-                  <tr key={a.app_number} className="border-t">
-                    <td className="px-3 py-2 font-mono">{a.app_number}</td>
-                    <td className="px-3 py-2">{formatName(a.applicant_name)}</td>
-                    <td className="px-3 py-2 text-muted-foreground">
-                      {new Date(a.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-3 py-2">
-                      <span className={statusBadge(a.status)}>{a.status}</span>
-                    </td>
-                    <td className="px-3 py-2 text-right">
-                      <Link
-                        to="/application/$id"
-                        params={{ id: String(a.app_number) }}
-                        className="text-sss-navy underline text-xs"
-                      >
-                        View
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+        <div className="border border-sss-form-border bg-white shadow-sm rounded-xl overflow-hidden mt-2">
+          <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider">
+            Application History
+          </div>
+          <div className="p-0">
+            {isLoading ? (
+              <div className="p-8 text-center text-sm text-gray-500">Loading your applications…</div>
+            ) : apps.length === 0 ? (
+              <div className="p-12 text-center text-sm text-gray-500">
+                <p className="text-lg font-medium text-gray-700 mb-2">No applications found</p>
+                No applications yet. Click "New Application" to begin.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr className="text-left">
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">App Number</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">Applicant</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">Submitted</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">Status</th>
+                      <th className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {apps.map((a) => (
+                      <tr key={a.app_number} className="hover:bg-blue-50/50 transition-colors">
+                        <td className="px-6 py-4 font-mono text-gray-700 font-medium">{String(a.app_number).padStart(12, '0')}</td>
+                        <td className="px-6 py-4 text-gray-800">{formatName(a.applicant_name)}</td>
+                        <td className="px-6 py-4 text-gray-500">
+                          {new Date(a.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={statusBadge(a.status)}>{a.status}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Link
+                            to="/application/$id"
+                            params={{ id: String(a.app_number) }}
+                            className="text-[#0284c7] font-semibold hover:underline text-sm"
+                          >
+                            View
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </main>
       <SssFooter />

@@ -62,7 +62,7 @@ function SettingsPage() {
     try {
       const { error } = await supabase.auth.updateUser({ email });
       if (error) throw error;
-      toast.success("Confirmation emails have been sent to both your old and new email addresses.");
+      toast.success("Security measure: A confirmation email has been sent to your CURRENT email first. Once confirmed, a second email will be sent to the NEW email address.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update email address.");
     } finally {
@@ -144,7 +144,7 @@ function SettingsPage() {
                     {isActive && (
                       <motion.div
                         layoutId="settingsActiveTab"
-                        className="absolute inset-0 bg-blue-50 border-l-4 border-sss-navy z-0"
+                        className="absolute inset-0 bg-blue-50 border-l-4 border-[#0284c7] z-0"
                         initial={false}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
@@ -192,7 +192,9 @@ function SettingsPage() {
                 <div className="sss-section-header rounded-t-md">Change Email</div>
                 <div className="p-6">
                   <p className="text-sm text-muted-foreground mb-6">
-                    Changing your email address will require you to verify the change via a secure link sent to both your old and new email inboxes.
+                    <strong>Note on Security:</strong> Supabase requires "Secure Email Change" by default. This means when you update your email, you will first receive an email at your <strong>CURRENT</strong> address. You must click the link in that email to authorize the change. Only after that will a final confirmation be sent to your <strong>NEW</strong> email address. 
+                    <br/><br/>
+                    Also, if the verification email says "Confirm your Registration" instead of "Confirm Email Change", you need to update the "Change Email Address" template text in your Supabase Dashboard -> Authentication -> Email Templates.
                   </p>
                   
                   <form onSubmit={handleUpdateEmail} className="space-y-4 max-w-sm">
@@ -208,7 +210,7 @@ function SettingsPage() {
                     </div>
                     <button
                       disabled={loading || email === currentEmail}
-                      className="w-full py-2 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase hover:bg-sss-navy-dark disabled:opacity-50 rounded-md"
+                      className="w-full py-2 bg-[#0284c7] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#0369a1] disabled:opacity-50 rounded-md shadow-sm transition-colors"
                     >
                       {loading ? "Updating..." : "Update Email"}
                     </button>
@@ -248,7 +250,7 @@ function SettingsPage() {
                     </div>
                     <button
                       disabled={loadingPassword || !password || !confirmPassword}
-                      className="w-full py-2 bg-sss-navy text-white text-sm font-bold tracking-wide uppercase hover:bg-sss-navy-dark disabled:opacity-50 rounded-md"
+                      className="w-full py-2 bg-[#0284c7] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#0369a1] disabled:opacity-50 rounded-md shadow-sm transition-colors"
                     >
                       {loadingPassword ? "Updating..." : "Update Password"}
                     </button>
