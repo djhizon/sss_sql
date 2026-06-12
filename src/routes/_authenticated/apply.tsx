@@ -324,7 +324,9 @@ function ApplyPage() {
               onClick={handlePrefill}
               className="px-5 py-2.5 bg-blue-50 text-blue-700 text-sm font-bold uppercase tracking-wide hover:bg-blue-100 border border-blue-200 rounded-md shadow-sm text-center transition-all active:scale-95 flex items-center gap-2"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.707 14.707a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L8 12.586l6.293-6.293a1 1 0 011.414 1.414l-7 7z" /></svg>
+              <div className="w-4 h-4 bg-white border border-blue-300 rounded-sm flex items-center justify-center shadow-sm">
+                <svg className="w-3 h-3 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
               PREFILL WITH SYNTHETIC DATA
             </button>
           </div>

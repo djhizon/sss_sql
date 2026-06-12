@@ -50,18 +50,13 @@ export default async function handler(req: Request) {
     let subject = "Action Required: Confirm your SSS Member Portal Registration";
     let messagePrefix = "Thank you for registering at the SSS Member Services Portal. To complete your registration and secure your account, please confirm your email address by clicking the button below.";
     
-    // Instead of exposing the API key, we point to our Vercel Serverless proxy which attaches it safely.
-    // We use the actual Vercel domain instead of the raw Supabase URL from the webhook payload
     const vercelDomain = "https://sss-sql.vercel.app";
-    
     let targetRedirect = email_data.redirect_to;
-    // Prevent redirecting to raw Supabase API domain
     if (!targetRedirect || targetRedirect.includes("api.supabase.com") || targetRedirect.includes("localhost:8000")) {
       targetRedirect = `${vercelDomain}/settings`;
     }
     
     if (email_data.email_action_type === 'recovery') {
-      // Force redirect to the secure update-password page for recovery flows
       targetRedirect = `${vercelDomain}/update-password`;
     }
 
@@ -73,8 +68,8 @@ export default async function handler(req: Request) {
       messagePrefix = "We received a request to reset your password for your SSS Member Services Portal account. Please click the button below to choose a new password.";
     } else if (email_data.email_action_type === 'email_change') {
       actionLabel = "Confirm Email Change";
-      subject = "Action Required: Confirm your new email address";
-      messagePrefix = "We received a request to change the email address associated with your SSS Member Services Portal account. Please click the button below to confirm this change.";
+      subject = "Action Required: Confirm your email update";
+      messagePrefix = "We received a request to change the email address associated with your SSS Member Services Portal account. Please click the button below to confirm this action.";
     }
 
     // 3. Construct Simple HTML Email Body
@@ -85,11 +80,9 @@ export default async function handler(req: Request) {
           <p style="color: #4a4a4a; line-height: 1.6; font-size: 14px;">
             ${messagePrefix}
           </p>
-          
           <div style="margin: 30px 0;">
             <a href="${magicLink}" style="background-color: #0038A8; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; font-size: 14px; border-radius: 6px; display: inline-block;">${actionLabel}</a>
           </div>
-          
           <p style="color: #666666; font-size: 12px; line-height: 1.5; border-top: 1px solid #eaeaea; padding-top: 20px;">
             If the button above does not work, copy and paste the following secure verification URL into your browser:<br><br>
             <a href="${magicLink}" style="color: #0038A8; word-break: break-all;">${magicLink}</a>
@@ -98,32 +91,41 @@ export default async function handler(req: Request) {
       </div>
     `;
 
-    // 4. Send Email via MS Graph
-    const sendMailResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${senderEmail}/sendMail`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${tokenData.access_token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: {
-          subject: subject,
-          body: { contentType: "HTML", content: emailHtml },
-          toRecipients: [{ emailAddress: { address: user.email } }]
-        },
-        saveToSentItems: "false"
-      })
-    });
-
-    if (!sendMailResponse.ok) {
-      const err = await sendMailResponse.json();
-      console.error("Microsoft Graph Error:", err);
-      throw new Error(`Graph API Error: ${JSON.stringify(err)}`);
+    // 4. Determine Recipients
+    // Supabase Webhooks don't tell us if it's sending the "Confirm Old Email" or "Confirm New Email" 
+    // step of the email_change flow. So we send to BOTH to guarantee delivery to the correct inbox!
+    const recipients = [user.email];
+    if (email_data.email_action_type === 'email_change' && user.new_email && user.new_email !== user.email) {
+      recipients.push(user.new_email);
     }
 
-    console.log(`Successfully sent email to ${user.email} via Microsoft Graph API`);
+    // 5. Send Email(s) via MS Graph
+    for (const recipient of recipients) {
+      const sendMailResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${senderEmail}/sendMail`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${tokenData.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: {
+            subject: subject,
+            body: { contentType: "HTML", content: emailHtml },
+            toRecipients: [{ emailAddress: { address: recipient } }]
+          },
+          saveToSentItems: "false"
+        })
+      });
 
-    return new Response(JSON.stringify({ message: "Email sent successfully" }), {
+      if (!sendMailResponse.ok) {
+        const err = await sendMailResponse.json();
+        console.error("Microsoft Graph Error for " + recipient + ":", err);
+        throw new Error(`Graph API Error: ${JSON.stringify(err)}`);
+      }
+      console.log(`Successfully sent email to ${recipient} via Microsoft Graph API`);
+    }
+
+    return new Response(JSON.stringify({ message: "Email(s) sent successfully" }), {
       headers: { "Content-Type": "application/json" },
       status: 200,
     });
