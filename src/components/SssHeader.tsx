@@ -36,10 +36,10 @@ export function SssHeader({ user, isAdmin }: Props) {
               </>
             ) : (
               <div className="flex gap-3">
-                <Link to="/auth" className="hover:underline">
+                <Link to="/auth" search={{ mode: "login" }} className="hover:underline">
                   Sign In
                 </Link>
-                <Link to="/auth" className="hover:underline">
+                <Link to="/auth" search={{ mode: "register" }} className="hover:underline">
                   Register
                 </Link>
               </div>

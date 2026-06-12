@@ -146,7 +146,7 @@ function AdminPage() {
             <button
               key={s}
               onClick={() => setStatus(s)}
-              className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0284c7] text-white border-[#0284c7]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
+              className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
             >
               {s}
             </button>
@@ -252,7 +252,7 @@ function AdminPage() {
                     <Link
                       to="/application/$id"
                       params={{ id: String(detail.app_number) }}
-                      className="text-xs uppercase font-bold tracking-widest text-[#0284c7] border border-[#0284c7] px-4 py-2 hover:bg-[#0284c7] hover:text-white transition-colors rounded-md shadow-sm"
+                      className="text-xs uppercase font-bold tracking-widest text-[#0038a8] border border-[#0038a8] px-4 py-2 hover:bg-[#0038a8] hover:text-white transition-colors rounded-md shadow-sm"
                     >
                       View Full Application &rarr;
                     </Link>

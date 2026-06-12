@@ -55,6 +55,11 @@ export default async function handler(req: Request) {
     const vercelDomain = "https://sss-sql.vercel.app";
     
     let targetRedirect = email_data.redirect_to;
+    // Prevent redirecting to raw Supabase API domain
+    if (!targetRedirect || targetRedirect.includes("api.supabase.com") || targetRedirect.includes("localhost:8000")) {
+      targetRedirect = `${vercelDomain}/settings`;
+    }
+    
     if (email_data.email_action_type === 'recovery') {
       // Force redirect to the secure update-password page for recovery flows
       targetRedirect = `${vercelDomain}/update-password`;

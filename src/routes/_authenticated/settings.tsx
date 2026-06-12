@@ -30,7 +30,14 @@ function SettingsPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loadingPassword, setLoadingPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [user, setUser] = useState<any>(null);
+  
+  const isLengthValid = password.length >= 8;
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSymbol = /[^A-Za-z0-9]/.test(password);
   
   const { theme, setTheme } = useTheme();
 
@@ -144,7 +151,7 @@ function SettingsPage() {
                     {isActive && (
                       <motion.div
                         layoutId="settingsActiveTab"
-                        className="absolute inset-0 bg-blue-50 border-l-4 border-[#0284c7] z-0"
+                        className="absolute inset-0 bg-blue-50 border-l-4 border-[#0038a8] z-0"
                         initial={false}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
@@ -191,11 +198,11 @@ function SettingsPage() {
               <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
                 <div className="sss-section-header rounded-t-md">Change Email</div>
                 <div className="p-6">
-                  <p className="text-sm text-muted-foreground mb-6">
-                    <strong>Note on Security:</strong> Supabase requires "Secure Email Change" by default. This means when you update your email, you will first receive an email at your <strong>CURRENT</strong> address. You must click the link in that email to authorize the change. Only after that will a final confirmation be sent to your <strong>NEW</strong> email address. 
-                    <br/><br/>
-                    Also, if the verification email says "Confirm your Registration" instead of "Confirm Email Change", you need to update the "Change Email Address" template text in your Supabase Dashboard to Authentication to Email Templates.
-                  </p>
+                  <div className="bg-blue-50/50 border-l-4 border-[#0038a8] p-4 rounded-md mb-6">
+                    <p className="text-sm text-foreground">
+                      <strong>Security Notice:</strong> To protect your account, you will first receive an authorization link at your <strong>CURRENT</strong> email address. You must click that link before a final confirmation is sent to your <strong>NEW</strong> email address. 
+                    </p>
+                  </div>
                   
                   <form onSubmit={handleUpdateEmail} className="space-y-4 max-w-sm">
                     <div>
@@ -210,7 +217,7 @@ function SettingsPage() {
                     </div>
                     <button
                       disabled={loading || email === currentEmail}
-                      className="w-full py-2 bg-[#0284c7] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#0369a1] disabled:opacity-50 rounded-md shadow-sm transition-colors"
+                      className="w-full py-2 bg-[#0038a8] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#002879] disabled:opacity-50 rounded-md shadow-sm transition-colors"
                     >
                       {loading ? "Updating..." : "Update Email"}
                     </button>
@@ -228,7 +235,7 @@ function SettingsPage() {
                   </p>
                   
                   <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-sm">
-                    <div>
+                    <div className="relative">
                       <label className="sss-label">New Password</label>
                       <input
                         type="password"
@@ -236,7 +243,36 @@ function SettingsPage() {
                         className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-2 focus:outline-primary rounded-md"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onFocus={() => setIsPasswordFocused(true)}
+                        onBlur={() => setIsPasswordFocused(false)}
                       />
+                      
+                      {/* Password Requirements Popover */}
+                      {(isPasswordFocused || (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSymbol)) && password.length > 0 && (
+                        <div className="absolute top-full left-0 mt-2 w-full bg-card border border-border shadow-xl rounded-md p-4 z-50 text-xs">
+                          <div className="absolute -top-1.5 left-6 w-3 h-3 bg-card border-t border-l border-border rotate-45"></div>
+                          <div className="relative z-10">
+                            <p className="font-bold text-[#0038a8] mb-2 tracking-wide text-[10px] uppercase">Password Must</p>
+                            <ul className="space-y-1.5">
+                              <li className={`flex items-center gap-2 ${isLengthValid ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
+                                <span className="w-3 text-center">{isLengthValid ? "✓" : "•"}</span> Be at least 8 characters
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasUppercase ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
+                                <span className="w-3 text-center">{hasUppercase ? "✓" : "•"}</span> Contain at least one uppercase letter
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasLowercase ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
+                                <span className="w-3 text-center">{hasLowercase ? "✓" : "•"}</span> Contain at least one lowercase letter
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasNumber ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
+                                <span className="w-3 text-center">{hasNumber ? "✓" : "•"}</span> Contain at least one number
+                              </li>
+                              <li className={`flex items-center gap-2 ${hasSymbol ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
+                                <span className="w-3 text-center">{hasSymbol ? "✓" : "•"}</span> Contain at least one symbol
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="sss-label">Confirm New Password</label>
@@ -249,8 +285,8 @@ function SettingsPage() {
                       />
                     </div>
                     <button
-                      disabled={loadingPassword || !password || !confirmPassword}
-                      className="w-full py-2 bg-[#0284c7] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#0369a1] disabled:opacity-50 rounded-md shadow-sm transition-colors"
+                      disabled={loadingPassword || !password || !confirmPassword || !isLengthValid || !hasUppercase || !hasLowercase || !hasNumber || !hasSymbol}
+                      className="w-full py-2 bg-[#0038a8] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#002879] disabled:opacity-50 rounded-md shadow-sm transition-colors"
                     >
                       {loadingPassword ? "Updating..." : "Update Password"}
                     </button>

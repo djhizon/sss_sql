@@ -63,9 +63,9 @@
   --ring: oklch(0.32 0.1 255);
 
   /* SSS palette (approximated from sss.gov.ph) */
-  --sss-navy: #0038a8; /* deep govt blue */
-  --sss-navy-dark: #002878; /* darker band */
-  --sss-gold: #0284c7; /* replaced gold with a bright modern blue for accents */
+  --sss-navy: #0038a8; /* new brand blue requested by user */
+  --sss-navy-dark: #002879; /* darker hover state for new brand blue */
+  --sss-gold: #0038a8; /* accent color matched to new brand blue */
   --sss-form-bg: #ffffff;
   --sss-form-border: #e5e7eb; /* softened borders */
   --sss-section-bg: #f8fafc; /* modern soft blue-gray section header bar */

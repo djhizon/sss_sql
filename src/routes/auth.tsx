@@ -13,12 +13,20 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in or register for the SSS Member Portal." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { mode?: "login" | "register" | "forgot_password" } => {
+    return {
+      mode: search.mode as "login" | "register" | "forgot_password" | undefined,
+    }
+  },
   component: AuthPage,
 });
 
+import { useSearch } from "@tanstack/react-router";
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "register" | "forgot_password">("login");
+  const search = useSearch({ from: "/auth" }) as { mode?: "login" | "register" | "forgot_password" };
+  const [mode, setMode] = useState<"login" | "register" | "forgot_password">(search.mode || "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +52,12 @@ function AuthPage() {
       if (data.session) navigate({ to: "/dashboard", replace: true });
     });
   }, [navigate]);
+
+  useEffect(() => {
+    if (search.mode && search.mode !== mode) {
+      setMode(search.mode);
+    }
+  }, [search.mode]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -137,7 +151,7 @@ function AuthPage() {
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/sss_bg.png')" }}
       >
-        <div className="absolute inset-0 bg-[#1a365d]/70 backdrop-blur-md"></div>
+        <div className="absolute inset-0 bg-[#002879]/70 backdrop-blur-md"></div>
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
@@ -145,14 +159,14 @@ function AuthPage() {
         <main className="flex-1 flex items-start justify-center px-4 py-10 mt-8">
           <motion.div 
             className="w-full flex justify-center items-start"
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            style={{ willChange: "transform" }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
           >
             <div className={`w-full ${mode === "register" ? "max-w-lg" : "max-w-md"} transition-[max-width] duration-300 shadow-[0_20px_70px_rgba(0,0,0,0.8)] rounded-lg overflow-hidden`}>
               
-              {/* Dark Navy Header */}
-              <div className="bg-[#1a365d] p-8 text-center border-b border-[#2a4a7f]">
+              {/* Header */}
+              <div className="bg-[#0038a8] p-8 text-center border-b border-[#002879]">
                 <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
                   {mode === "forgot_password" ? "Reset Password" : mode === "login" ? "Sign In to Portal" : "Create Account"}
                 </h2>
@@ -276,21 +290,21 @@ function AuthPage() {
                           <div className="absolute top-full left-0 mt-2 w-full sm:w-[280px] bg-white border border-gray-200 shadow-xl rounded p-4 z-50 text-xs">
                             <div className="absolute -top-1.5 left-6 w-3 h-3 bg-white border-t border-l border-gray-200 rotate-45"></div>
                             <div className="relative z-10">
-                              <p className="font-bold text-gray-500 mb-2 tracking-wide text-[10px] uppercase">Password Must</p>
+                              <p className="font-bold text-[#0038a8] mb-2 tracking-wide text-[10px] uppercase">Password Must</p>
                               <ul className="space-y-1.5">
-                                <li className={`flex items-center gap-2 ${isLengthValid ? "text-green-600" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${isLengthValid ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{isLengthValid ? "✓" : "•"}</span> Be at least 8 characters
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasUppercase ? "text-green-600" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasUppercase ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasUppercase ? "✓" : "•"}</span> Contain at least one uppercase letter
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasLowercase ? "text-green-600" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasLowercase ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasLowercase ? "✓" : "•"}</span> Contain at least one lowercase letter
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasNumber ? "text-green-600" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasNumber ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasNumber ? "✓" : "•"}</span> Contain at least one number
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasSymbol ? "text-green-600" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasSymbol ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasSymbol ? "✓" : "•"}</span> Contain at least one symbol
                                 </li>
                               </ul>
@@ -304,7 +318,7 @@ function AuthPage() {
                           <button
                             type="button"
                             onClick={() => setMode("forgot_password")}
-                            className="text-xs font-bold text-[#1a365d] hover:underline"
+                            className="text-xs font-bold text-[#0038a8] hover:underline"
                           >
                             Forgot Password?
                           </button>
@@ -329,7 +343,7 @@ function AuthPage() {
                 <div className="pt-2">
                   <button
                     disabled={loading}
-                    className="w-full py-3 bg-[#0f2444] text-white text-sm font-bold tracking-wide rounded hover:bg-[#1a365d] disabled:opacity-60 transition-colors flex items-center justify-center gap-2 shadow-md"
+                    className="w-full py-3 bg-[#0038a8] text-white text-sm font-bold tracking-wide rounded hover:bg-[#002879] disabled:opacity-60 transition-colors flex items-center justify-center gap-2 shadow-md"
                   >
                     {loading ? "Please wait…" : mode === "forgot_password" ? "Send Reset Link" : mode === "login" ? "Log In" : "Create Account"}
                   </button>
@@ -339,7 +353,7 @@ function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setMode("login")}
-                    className="w-full py-2 text-sm text-[#1a365d] font-bold hover:underline"
+                    className="w-full py-2 text-sm text-[#0038a8] font-bold hover:underline"
                   >
                     Back to Sign In
                   </button>
@@ -359,7 +373,7 @@ function AuthPage() {
                     <button 
                       type="button" 
                       onClick={() => setMode("register")} 
-                      className="shrink-0 px-5 py-2.5 bg-[#0284c7] text-white text-sm font-bold rounded-md hover:bg-[#0369a1] transition-all shadow-sm hover:shadow"
+                      className="shrink-0 px-5 py-2.5 bg-[#0038a8] text-white text-sm font-bold rounded-md hover:bg-[#002879] transition-all shadow-sm hover:shadow"
                     >
                       + Register Now
                     </button>
@@ -373,7 +387,7 @@ function AuthPage() {
                     <button 
                       type="button" 
                       onClick={() => setMode("login")} 
-                      className="shrink-0 px-5 py-2.5 bg-[#1a365d] text-white text-sm font-bold rounded hover:bg-[#0f2444] transition-colors shadow-sm"
+                      className="shrink-0 px-5 py-2.5 bg-[#0038a8] text-white text-sm font-bold rounded hover:bg-[#002879] transition-colors shadow-sm"
                     >
                       Sign In
                     </button>

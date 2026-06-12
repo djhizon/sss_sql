@@ -39,7 +39,7 @@ function Dashboard() {
           </div>
           <Link
             to="/apply"
-            className="px-5 py-2.5 bg-[#0284c7] text-white text-sm font-bold uppercase tracking-wide hover:bg-[#0369a1] rounded-md shadow-sm hover:shadow transition-all"
+            className="px-5 py-2.5 bg-[#0038a8] text-white text-sm font-bold uppercase tracking-wide hover:bg-[#002879] rounded-md shadow-sm hover:shadow transition-all"
           >
             + New Application
           </Link>
@@ -84,7 +84,7 @@ function Dashboard() {
                           <Link
                             to="/application/$id"
                             params={{ id: String(a.app_number) }}
-                            className="text-[#0284c7] font-semibold hover:underline text-sm"
+                            className="text-[#0038a8] font-semibold hover:underline text-sm"
                           >
                             View
                           </Link>
