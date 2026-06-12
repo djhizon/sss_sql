@@ -273,7 +273,7 @@ function AdminPage() {
                           onClick={() => handleDecide("rejected")}
                           className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-600 hover:bg-red-700 text-white text-xs uppercase font-bold rounded"
                         >
-                          <X className="w-4 h-4" /> Decline
+                          <X className="w-4 h-4" /> Reject
                         </button>
                       </div>
                     </div>

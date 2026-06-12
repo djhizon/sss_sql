@@ -60,9 +60,11 @@ export default async function handler(req: Request) {
       targetRedirect = `${vercelDomain}/update-password`;
     }
 
+    const actualToken = email_data.token_hash || email_data.token;
     let queryParams = `type=${email_data.email_action_type}&redirect_to=${encodeURIComponent(targetRedirect)}`;
-    if (email_data.token_hash) queryParams += `&token_hash=${encodeURIComponent(email_data.token_hash)}`;
-    if (email_data.token) queryParams += `&token=${encodeURIComponent(email_data.token)}`;
+    if (actualToken) {
+      queryParams += `&token=${encodeURIComponent(actualToken)}`;
+    }
     
     const magicLink = `${vercelDomain}/api/verify?${queryParams}`;
 

@@ -67,9 +67,23 @@ function SettingsPage() {
     
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ email });
-      if (error) throw error;
-      toast.success("Security measure: A confirmation email has been sent to your CURRENT email first. Once confirmed, a second email will be sent to the NEW email address.");
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) throw new Error("Not authenticated");
+
+      const response = await fetch('/api/change-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionData.session.access_token}`
+        },
+        body: JSON.stringify({ newEmail: email })
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed to update email address");
+
+      toast.success("Your email address has been updated successfully!");
+      setCurrentEmail(email);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update email address.");
     } finally {

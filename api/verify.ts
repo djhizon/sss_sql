@@ -22,8 +22,11 @@ export default async function handler(req: Request) {
     }
 
     let verifyQuery = `type=${type}&redirect_to=${encodeURIComponent(redirect_to)}&apikey=${supabaseKey}`;
-    if (tokenHash) verifyQuery += `&token_hash=${encodeURIComponent(tokenHash)}`;
-    if (token) verifyQuery += `&token=${encodeURIComponent(token)}`;
+    // Always use the 'token' parameter for Supabase API, even if it's a hashed token!
+    const actualToken = token || tokenHash;
+    if (actualToken) {
+      verifyQuery += `&token=${encodeURIComponent(actualToken)}`;
+    }
 
     // Construct the secure Supabase Verification URL
     const verifyUrl = `${supabaseUrl}/auth/v1/verify?${verifyQuery}`;
