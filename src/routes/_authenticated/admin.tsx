@@ -8,6 +8,8 @@ import {
   adminDecide,
   getApplication,
   checkIsAdmin,
+  adminListUsers,
+  adminUpdateUserRole,
 } from "@/lib/applications.functions";
 import { toast } from "sonner";
 import { Check, X, Search } from "lucide-react";
@@ -25,6 +27,7 @@ function AdminPage() {
   const [user, setUser] = useState<{ email?: string | null } | null>(null);
   const qc = useQueryClient();
 
+  const [activeTab, setActiveTab] = useState<"applications" | "users">("applications");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
@@ -63,6 +66,24 @@ function AdminPage() {
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  });
+
+  const { data: users = [], isLoading: loadingUsers } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: () => adminListUsers(),
+    enabled: !!adminData?.isAdmin && activeTab === "users",
+  });
+
+  const roleMutation = useMutation({
+    mutationFn: (args: { userId: string; role: "admin" | "user" }) =>
+      adminUpdateUserRole({ data: args }),
+    onSuccess: () => {
+      toast.success("User role updated successfully");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to update role");
     }
   });
 
@@ -115,10 +136,27 @@ function AdminPage() {
     <div className="min-h-screen flex flex-col">
       <SssHeader user={user} isAdmin />
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-          <h2 className="text-xl font-bold text-sss-navy-dark">Admin — Application Queue</h2>
-          
-          <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex gap-4 mb-6 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("applications")}
+            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "applications" ? "border-b-2 border-[#0038a8] text-[#0038a8]" : "text-gray-500 hover:text-gray-800"}`}
+          >
+            Applications
+          </button>
+          <button
+            onClick={() => setActiveTab("users")}
+            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "users" ? "border-b-2 border-[#0038a8] text-[#0038a8]" : "text-gray-500 hover:text-gray-800"}`}
+          >
+            Users
+          </button>
+        </div>
+
+        {activeTab === "applications" && (
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+              <h2 className="text-xl font-bold text-sss-navy-dark">Admin — Application Queue</h2>
+              
+              <div className="flex gap-2 w-full md:w-auto">
             <div className="relative flex items-center w-full md:w-64">
               <Search className="absolute left-2.5 w-4 h-4 text-gray-400 z-10" />
               <ClearableInput 
@@ -262,6 +300,55 @@ function AdminPage() {
             </div>
           </div>
         </div>
+        )}
+
+        {activeTab === "users" && (
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
+              Registered Users
+            </div>
+            <div className="p-0 overflow-auto">
+              {loadingUsers ? (
+                <div className="p-6 text-sm text-center text-gray-500">Loading users…</div>
+              ) : users.length === 0 ? (
+                <div className="p-6 text-sm text-center text-gray-500">No users found.</div>
+              ) : (
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Name</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Email</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Phone</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Birthdate</th>
+                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500 w-32">Role</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {users.map((u: any) => (
+                      <tr key={u.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-800">{u.first_name} {u.last_name}</td>
+                        <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                        <td className="px-4 py-3 text-gray-600">{u.phone || "—"}</td>
+                        <td className="px-4 py-3 text-gray-600">{u.birthdate || "—"}</td>
+                        <td className="px-4 py-3">
+                          <select 
+                            className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}`}
+                            value={u.role}
+                            disabled={roleMutation.isPending && roleMutation.variables?.userId === u.id}
+                            onChange={(e) => roleMutation.mutate({ userId: u.id, role: e.target.value as "admin" | "user" })}
+                          >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
       </main>
       <SssFooter />
     </div>

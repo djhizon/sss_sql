@@ -99,3 +99,42 @@ export async function adminDecide({ data }: { data: { id: number; decision: "app
   if (error) throw new Error(error.message);
   return { ok: true };
 }
+
+export async function adminListUsers() {
+  const { data: userData, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !userData.user) throw new Error("Unauthorized");
+
+  const { data, error } = await supabase
+    .from("admin_users_view")
+    .select("*")
+    .order("last_name", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function adminUpdateUserRole({ data }: { data: { userId: string; role: "admin" | "user" } }) {
+  z.object({
+    userId: z.string().uuid(),
+    role: z.enum(["admin", "user"]),
+  }).parse(data);
+
+  const { data: userData, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !userData.user) throw new Error("Unauthorized");
+
+  if (data.role === "user") {
+    // If setting to user, delete the role from user_roles (since default is user)
+    const { error } = await supabase
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId)
+      .eq("role", "admin");
+    if (error) throw new Error(error.message);
+  } else {
+    // If setting to admin, upsert into user_roles
+    const { error } = await supabase
+      .from("user_roles")
+      .upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id, role" });
+    if (error) throw new Error(error.message);
+  }
+  return { ok: true };
+}
