@@ -20,8 +20,11 @@ export default async function handler(req: Request) {
       return new Response("Server Configuration Error", { status: 500 });
     }
 
+    const isHash = url.searchParams.get('is_hash') === 'true';
+    const tokenParam = isHash ? 'token_hash' : 'token';
+
     // Construct the secure Supabase Verification URL
-    const verifyUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=${type}&redirect_to=${encodeURIComponent(redirect_to)}&apikey=${supabaseKey}`;
+    const verifyUrl = `${supabaseUrl}/auth/v1/verify?${tokenParam}=${token}&type=${type}&redirect_to=${encodeURIComponent(redirect_to)}&apikey=${supabaseKey}`;
 
     // Redirect the browser to Supabase's API. Supabase will instantly process it and redirect back to the app with the session.
     return Response.redirect(verifyUrl, 302);
