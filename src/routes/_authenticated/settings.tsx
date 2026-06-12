@@ -70,7 +70,7 @@ function SettingsPage() {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) throw new Error("Not authenticated");
 
-      const response = await fetch('/api/change-email', {
+      const response = await fetch('/api/request-email-change', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,11 +79,16 @@ function SettingsPage() {
         body: JSON.stringify({ newEmail: email })
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        throw new Error("Server returned an invalid response. Please try again.");
+      }
+      
       if (!response.ok) throw new Error(result.error || "Failed to update email address");
 
-      toast.success("Your email address has been updated successfully!");
-      setCurrentEmail(email);
+      toast.success("Confirmation sent to your CURRENT email address.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update email address.");
     } finally {
