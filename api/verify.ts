@@ -6,10 +6,11 @@ export default async function handler(req: Request) {
   try {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
+    const tokenHash = url.searchParams.get('token_hash');
     const type = url.searchParams.get('type');
     const redirect_to = url.searchParams.get('redirect_to') || '/dashboard';
 
-    if (!token || !type) {
+    if ((!token && !tokenHash) || !type) {
       return new Response("Missing verification parameters", { status: 400 });
     }
 
@@ -20,11 +21,12 @@ export default async function handler(req: Request) {
       return new Response("Server Configuration Error", { status: 500 });
     }
 
-    const isHash = url.searchParams.get('is_hash') === 'true';
-    const tokenParam = isHash ? 'token_hash' : 'token';
+    let verifyQuery = `type=${type}&redirect_to=${encodeURIComponent(redirect_to)}&apikey=${supabaseKey}`;
+    if (tokenHash) verifyQuery += `&token_hash=${encodeURIComponent(tokenHash)}`;
+    if (token) verifyQuery += `&token=${encodeURIComponent(token)}`;
 
     // Construct the secure Supabase Verification URL
-    const verifyUrl = `${supabaseUrl}/auth/v1/verify?${tokenParam}=${token}&type=${type}&redirect_to=${encodeURIComponent(redirect_to)}&apikey=${supabaseKey}`;
+    const verifyUrl = `${supabaseUrl}/auth/v1/verify?${verifyQuery}`;
 
     // Redirect the browser to Supabase's API. Supabase will instantly process it and redirect back to the app with the session.
     return Response.redirect(verifyUrl, 302);
