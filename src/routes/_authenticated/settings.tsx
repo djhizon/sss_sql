@@ -93,36 +93,17 @@ function SettingsPage() {
 
   async function handleUpdatePassword(e: React.FormEvent) {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long.");
-      return;
-    }
-    if (!/[A-Z]/.test(password)) {
-      toast.error("Password must contain at least one uppercase letter.");
-      return;
-    }
-    if (!/[0-9]/.test(password)) {
-      toast.error("Password must contain at least one number.");
-      return;
-    }
-    if (!/[^a-zA-Z0-9]/.test(password)) {
-      toast.error("Password must contain at least one special character.");
-      return;
-    }
+    if (!currentEmail) return;
     
     setLoadingPassword(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.resetPasswordForEmail(currentEmail, {
+        redirectTo: `${window.location.origin}/update-password`,
+      });
       if (error) throw error;
-      toast.success("Your password has been updated successfully.");
-      setPassword("");
-      setConfirmPassword("");
+      toast.success("A password reset link has been sent to your email address.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update password.");
+      toast.error(err instanceof Error ? err.message : "Failed to send password reset link.");
     } finally {
       setLoadingPassword(false);
     }
@@ -245,66 +226,19 @@ function SettingsPage() {
                 <div className="sss-section-header rounded-t-md">Change Password</div>
                 <div className="p-6">
                   <p className="text-sm text-muted-foreground mb-6">
-                    Ensure your account is using a long, random password to stay secure. Password must be at least 8 characters long, and contain an uppercase letter, a number, and a special character.
+                    For your security, changing your password requires verifying your current email address.
+                    Click the button below and we will send you a secure link to choose a new password.
                   </p>
                   
-                  <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-sm">
-                    <div className="relative">
-                      <label className="sss-label">New Password</label>
-                      <input
-                        type="password"
-                        required
-                        className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-2 focus:outline-primary rounded-md"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onFocus={() => setIsPasswordFocused(true)}
-                        onBlur={() => setIsPasswordFocused(false)}
-                      />
-                      
-                      {/* Password Requirements Popover */}
-                      {(isPasswordFocused || (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSymbol)) && password.length > 0 && (
-                        <div className="absolute top-full left-0 mt-2 w-full bg-card border border-border shadow-xl rounded-md p-4 z-50 text-xs">
-                          <div className="absolute -top-1.5 left-6 w-3 h-3 bg-card border-t border-l border-border rotate-45"></div>
-                          <div className="relative z-10">
-                            <p className="font-bold text-[#0038a8] mb-2 tracking-wide text-[10px] uppercase">Password Must</p>
-                            <ul className="space-y-1.5">
-                              <li className={`flex items-center gap-2 ${isLengthValid ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
-                                <span className="w-3 text-center">{isLengthValid ? "✓" : "•"}</span> Be at least 8 characters
-                              </li>
-                              <li className={`flex items-center gap-2 ${hasUppercase ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
-                                <span className="w-3 text-center">{hasUppercase ? "✓" : "•"}</span> Contain at least one uppercase letter
-                              </li>
-                              <li className={`flex items-center gap-2 ${hasLowercase ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
-                                <span className="w-3 text-center">{hasLowercase ? "✓" : "•"}</span> Contain at least one lowercase letter
-                              </li>
-                              <li className={`flex items-center gap-2 ${hasNumber ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
-                                <span className="w-3 text-center">{hasNumber ? "✓" : "•"}</span> Contain at least one number
-                              </li>
-                              <li className={`flex items-center gap-2 ${hasSymbol ? "text-[#0038a8] font-medium" : "text-muted-foreground"}`}>
-                                <span className="w-3 text-center">{hasSymbol ? "✓" : "•"}</span> Contain at least one symbol
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <label className="sss-label">Confirm New Password</label>
-                      <input
-                        type="password"
-                        required
-                        className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-2 focus:outline-primary rounded-md"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                    </div>
+                  <div className="max-w-sm">
                     <button
-                      disabled={loadingPassword || !password || !confirmPassword || !isLengthValid || !hasUppercase || !hasLowercase || !hasNumber || !hasSymbol}
+                      onClick={handleUpdatePassword}
+                      disabled={loadingPassword}
                       className="w-full py-2 bg-[#0038a8] text-white text-sm font-bold tracking-wide uppercase hover:bg-[#002879] disabled:opacity-50 rounded-md shadow-sm transition-colors"
                     >
-                      {loadingPassword ? "Updating..." : "Update Password"}
+                      {loadingPassword ? "Sending..." : "Send Password Reset Link"}
                     </button>
-                  </form>
+                  </div>
                 </div>
               </div>
             )}
