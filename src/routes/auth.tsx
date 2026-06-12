@@ -292,19 +292,19 @@ function AuthPage() {
                             <div className="relative z-10">
                               <p className="font-bold text-[#0038a8] mb-2 tracking-wide text-[10px] uppercase">Password Must</p>
                               <ul className="space-y-1.5">
-                                <li className={`flex items-center gap-2 ${isLengthValid ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${isLengthValid ? "text-green-600 font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{isLengthValid ? "✓" : "•"}</span> Be at least 8 characters
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasUppercase ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasUppercase ? "text-green-600 font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasUppercase ? "✓" : "•"}</span> Contain at least one uppercase letter
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasLowercase ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasLowercase ? "text-green-600 font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasLowercase ? "✓" : "•"}</span> Contain at least one lowercase letter
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasNumber ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasNumber ? "text-green-600 font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasNumber ? "✓" : "•"}</span> Contain at least one number
                                 </li>
-                                <li className={`flex items-center gap-2 ${hasSymbol ? "text-[#0038a8] font-medium" : "text-gray-600"}`}>
+                                <li className={`flex items-center gap-2 ${hasSymbol ? "text-green-600 font-medium" : "text-gray-600"}`}>
                                   <span className="w-3 text-center">{hasSymbol ? "✓" : "•"}</span> Contain at least one symbol
                                 </li>
                               </ul>

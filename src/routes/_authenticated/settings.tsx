@@ -195,7 +195,7 @@ function SettingsPage() {
                 <div className="p-6">
                   <div className="bg-blue-50/50 border-l-4 border-[#0038a8] p-4 rounded-md mb-6">
                     <p className="text-sm text-foreground">
-                      <strong>Security Notice:</strong> To protect your account, you will first receive an authorization link at your <strong>CURRENT</strong> email address. You must click that link before a final confirmation is sent to your <strong>NEW</strong> email address. 
+                      <strong>Security Notice:</strong> To protect your account, you will receive an authorization link at your <strong>CURRENT</strong> email address. Once authorized, your email will be instantly updated and a notification will be sent to your new address. 
                     </p>
                   </div>
                   
