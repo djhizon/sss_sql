@@ -95,8 +95,9 @@ export default async function handler(req: Request) {
     // Supabase Webhooks don't tell us if it's sending the "Confirm Old Email" or "Confirm New Email" 
     // step of the email_change flow. So we send to BOTH to guarantee delivery to the correct inbox!
     const recipients = [user.email];
-    if (email_data.email_action_type === 'email_change' && user.new_email && user.new_email !== user.email) {
-      recipients.push(user.new_email);
+    const newEmailTarget = user.email_change || user.new_email;
+    if (email_data.email_action_type === 'email_change' && newEmailTarget && newEmailTarget !== user.email) {
+      recipients.push(newEmailTarget);
     }
 
     // 5. Send Email(s) via MS Graph
