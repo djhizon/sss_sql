@@ -66,6 +66,10 @@ export default async function handler(req: Request) {
       actionLabel = "Reset Password";
       subject = "Action Required: Reset your SSS Password";
       messagePrefix = "We received a request to reset your password for your SSS Member Services Portal account. Please click the button below to choose a new password.";
+    } else if (email_data.email_action_type === 'email_change') {
+      actionLabel = "Confirm Email Change";
+      subject = "Action Required: Confirm your new email address";
+      messagePrefix = "We received a request to change the email address associated with your SSS Member Services Portal account. Please click the button below to confirm this change.";
     }
 
     // 3. Construct Simple HTML Email Body

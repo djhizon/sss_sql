@@ -44,6 +44,7 @@ Here's a quick map of what lives where in the repository:
 
 ```text
 sss_sql/
+├── api/                # Vercel Edge Functions (e.g., custom mailer, email verification)
 ├── src/
 │   ├── components/         # Reusable UI parts (Headers, Form Inputs, etc.)
 │   ├── integrations/       # Supabase client setup & types
@@ -67,6 +68,14 @@ sss_sql/
 2. **Form Submission**: In `apply.tsx`, users fill out the form. When submitted, the frontend calls a "Server Function" (`submitApplication`).
 3. **Database Saving**: The server function validates the payload and inserts it directly into the `applications` PostgreSQL table on Supabase.
 4. **Admin Review**: Admins visit `admin.tsx` where another function checks their permissions. If approved, they see the queue of all applications.
+
+## Custom Email Infrastructure
+
+Because Supabase's default email sending rate is strictly limited on the free tier, the application uses a custom email handler:
+- **Webhook Trigger**: Supabase is configured to trigger a webhook whenever an auth email (signup, password reset, email change) needs to be sent.
+- **Vercel Edge Function (`api/send-auth-email.ts`)**: This endpoint receives the webhook payload from Supabase.
+- **Microsoft Graph API**: The edge function uses Microsoft Entra ID credentials (`MS_TENANT_ID`, `MS_CLIENT_ID`, `MS_CLIENT_SECRET`) to obtain an OAuth token and send the email from an authorized Microsoft 365 mailbox (`MS_SENDER_EMAIL`).
+- **Templates**: The email templates (including wording for signups, password resets, and email changes) are hardcoded and managed directly inside `api/send-auth-email.ts`, completely bypassing the templates configured in the Supabase Dashboard.
 
 ## Getting Started Locally
 
