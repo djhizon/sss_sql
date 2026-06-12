@@ -33,6 +33,8 @@ function AdminPage() {
   const [notes, setNotes] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"date_desc" | "date_asc" | "alpha_asc" | "alpha_desc">("date_desc");
+  const [visibleAppsCount, setVisibleAppsCount] = useState(10);
+  const [visibleUsersCount, setVisibleUsersCount] = useState(10);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -153,43 +155,43 @@ function AdminPage() {
 
         {activeTab === "applications" && (
           <div className="space-y-4">
+            <h2 className="text-xl font-bold text-sss-navy-dark mb-4">Admin — Application Queue</h2>
+            
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-              <h2 className="text-xl font-bold text-sss-navy-dark">Admin — Application Queue</h2>
+              <div className="flex flex-wrap gap-2 text-xs uppercase">
+                {(["pending", "approved", "rejected", "all"] as StatusFilter[]).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => { setStatus(s); setVisibleAppsCount(10); }}
+                    className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
               
-              <div className="flex gap-2 w-full md:w-auto">
-            <div className="relative flex items-center w-full md:w-64">
-              <Search className="absolute left-2.5 w-4 h-4 text-gray-400 z-10" />
-              <ClearableInput 
-                placeholder="Search Name or App #..." 
-                value={searchTerm}
-                onChange={(val) => setSearchTerm(val)}
-                className="sss-input text-sm py-1.5 pl-9"
-              />
+              <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <div className="relative flex items-center w-full sm:w-80">
+                  <Search className="absolute left-2.5 w-4 h-4 text-gray-400 z-10" />
+                  <ClearableInput 
+                    placeholder="Search Name or App #..." 
+                    value={searchTerm}
+                    onChange={(val) => { setSearchTerm(val); setVisibleAppsCount(10); }}
+                    className="sss-input text-sm py-1.5 pl-9 w-full"
+                  />
+                </div>
+                <select 
+                  value={sortBy} 
+                  onChange={(e: any) => setSortBy(e.target.value)}
+                  className="sss-input text-sm py-1.5 w-full sm:w-auto"
+                >
+                  <option value="date_desc">Newest First</option>
+                  <option value="date_asc">Oldest First</option>
+                  <option value="alpha_asc">Alphabetical (A-Z)</option>
+                  <option value="alpha_desc">Alphabetical (Z-A)</option>
+                </select>
+              </div>
             </div>
-            <select 
-              value={sortBy} 
-              onChange={(e: any) => setSortBy(e.target.value)}
-              className="sss-input text-sm py-1.5"
-            >
-              <option value="date_desc">Newest First</option>
-              <option value="date_asc">Oldest First</option>
-              <option value="alpha_asc">Alphabetical (A-Z)</option>
-              <option value="alpha_desc">Alphabetical (Z-A)</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 text-xs uppercase mb-4">
-          {(["pending", "approved", "rejected", "all"] as StatusFilter[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatus(s)}
-              className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
@@ -202,30 +204,51 @@ function AdminPage() {
               ) : filteredRows.length === 0 ? (
                 <div className="p-6 text-sm text-center text-gray-500">No applications match your criteria.</div>
               ) : (
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-200 text-left">
-                    <tr>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">#</th>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Applicant</th>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {filteredRows.map((r) => (
-                      <tr
-                        key={r.app_number}
-                        onClick={() => setSelected(r.app_number)}
-                        className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-blue-50/80" : "hover:bg-gray-50"}`}
-                      >
-                        <td className="px-4 py-3 font-mono text-gray-600">{r.app_number}</td>
-                        <td className="px-4 py-3 font-medium text-gray-800">{formatName(r.applicant_name)}</td>
-                        <td className="px-4 py-3 uppercase text-xs">
-                          <span className={statusBadge(r.status)}>{r.status}</span>
-                        </td>
+                <>
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b border-gray-200 text-left">
+                      <tr>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">#</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Applicant</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredRows.slice(0, visibleAppsCount).map((r) => (
+                        <tr
+                          key={r.app_number}
+                          onClick={() => setSelected(r.app_number)}
+                          className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-blue-50/80" : "hover:bg-gray-50"}`}
+                        >
+                          <td className="px-4 py-3 font-mono text-gray-600">{r.app_number}</td>
+                          <td className="px-4 py-3 font-medium text-gray-800">{formatName(r.applicant_name)}</td>
+                          <td className="px-4 py-3 uppercase text-xs">
+                            <span className={statusBadge(r.status)}>{r.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {filteredRows.length > 10 && (
+                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center">
+                      {visibleAppsCount < filteredRows.length ? (
+                        <button 
+                          onClick={() => setVisibleAppsCount(prev => prev + 10)}
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                        >
+                          Show More <span className="text-gray-400">▼</span>
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => setVisibleAppsCount(10)}
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                        >
+                          Show Less <span className="text-gray-400">▲</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -314,38 +337,59 @@ function AdminPage() {
               ) : users.length === 0 ? (
                 <div className="p-6 text-sm text-center text-gray-500">No users found.</div>
               ) : (
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Name</th>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Email</th>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Phone</th>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Birthdate</th>
-                      <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500 w-32">Role</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {users.map((u: any) => (
-                      <tr key={u.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-800">{u.first_name} {u.last_name}</td>
-                        <td className="px-4 py-3 text-gray-600">{u.email}</td>
-                        <td className="px-4 py-3 text-gray-600">{u.phone || "—"}</td>
-                        <td className="px-4 py-3 text-gray-600">{u.birthdate || "—"}</td>
-                        <td className="px-4 py-3">
-                          <select 
-                            className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}`}
-                            value={u.role}
-                            disabled={roleMutation.isPending && roleMutation.variables?.userId === u.id}
-                            onChange={(e) => roleMutation.mutate({ userId: u.id, role: e.target.value as "admin" | "user" })}
-                          >
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                          </select>
-                        </td>
+                <>
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Name</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Email</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Phone</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Birthdate</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500 w-32">Role</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {users.slice(0, visibleUsersCount).map((u: any) => (
+                        <tr key={u.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 font-medium text-gray-800">{u.first_name} {u.last_name}</td>
+                          <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                          <td className="px-4 py-3 text-gray-600">{u.phone || "—"}</td>
+                          <td className="px-4 py-3 text-gray-600">{u.birthdate || "—"}</td>
+                          <td className="px-4 py-3">
+                            <select 
+                              className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}`}
+                              value={u.role}
+                              disabled={roleMutation.isPending && roleMutation.variables?.userId === u.id}
+                              onChange={(e) => roleMutation.mutate({ userId: u.id, role: e.target.value as "admin" | "user" })}
+                            >
+                              <option value="user">User</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {users.length > 10 && (
+                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center">
+                      {visibleUsersCount < users.length ? (
+                        <button 
+                          onClick={() => setVisibleUsersCount(prev => prev + 10)}
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                        >
+                          Show More <span className="text-gray-400">▼</span>
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => setVisibleUsersCount(10)}
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                        >
+                          Show Less <span className="text-gray-400">▲</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

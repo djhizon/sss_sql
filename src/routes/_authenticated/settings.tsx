@@ -230,10 +230,11 @@ function SettingsPage() {
               <div className="bg-card text-card-foreground border border-border rounded-md shadow-sm">
                 <div className="sss-section-header rounded-t-md">Change Password</div>
                 <div className="p-6">
-                  <p className="text-sm text-muted-foreground mb-6">
-                    For your security, changing your password requires verifying your current email address.
-                    Click the button below and we will send you a secure link to choose a new password.
-                  </p>
+                  <div className="bg-blue-50/50 border-l-4 border-[#0038a8] p-4 rounded-md mb-6">
+                    <p className="text-sm text-foreground">
+                      <strong>Security Notice:</strong> For your security, changing your password requires verifying your current email address. Click the button below and we will send you a secure link to choose a new password.
+                    </p>
+                  </div>
                   
                   <div className="max-w-sm">
                     <button
