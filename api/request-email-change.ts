@@ -77,12 +77,21 @@ export default async function handler(req: Request) {
 
     // 2. Send email to CURRENT email address via MS Graph
     // First, get MS Graph token
-    const tokenResponse = await fetch("https://login.microsoftonline.com/978ed4e9-92b1-4cd4-88f5-93774cd20ab6/oauth2/v2.0/token", {
+    const tenantId = process.env.MS_TENANT_ID;
+    const clientId = process.env.MS_CLIENT_ID;
+    const clientSecret = process.env.MS_CLIENT_SECRET;
+    const senderEmail = process.env.MS_SENDER_EMAIL;
+
+    if (!tenantId || !clientId || !clientSecret || !senderEmail) {
+      throw new Error("Missing Microsoft OAuth credentials in environment");
+    }
+
+    const tokenResponse = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        client_id: process.env.MS_GRAPH_CLIENT_ID || "",
-        client_secret: process.env.MS_GRAPH_CLIENT_SECRET || "",
+        client_id: clientId,
+        client_secret: clientSecret,
         scope: "https://graph.microsoft.com/.default",
         grant_type: "client_credentials"
       })
@@ -93,7 +102,6 @@ export default async function handler(req: Request) {
     }
     
     const tokenData = await tokenResponse.json();
-    const senderEmail = process.env.MS_GRAPH_SENDER_EMAIL;
     
     // Construct magic link
     const confirmLink = `${vercelDomain}/api/confirm-email-change?token=${token}`;
