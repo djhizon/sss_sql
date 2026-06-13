@@ -142,13 +142,13 @@ function AdminPage() {
         <div className="flex gap-4 mb-6 border-b border-gray-200">
           <button
             onClick={() => setActiveTab("applications")}
-            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "applications" ? "border-b-2 border-[#0038a8] text-[#0038a8]" : "text-gray-500 hover:text-gray-800"}`}
+            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "applications" ? "border-b-2 border-[#0038a8] text-primary" : "text-muted-foreground hover:text-foreground"}`}
           >
             Applications
           </button>
           <button
             onClick={() => setActiveTab("users")}
-            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "users" ? "border-b-2 border-[#0038a8] text-[#0038a8]" : "text-gray-500 hover:text-gray-800"}`}
+            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "users" ? "border-b-2 border-[#0038a8] text-primary" : "text-muted-foreground hover:text-foreground"}`}
           >
             Users
           </button>
@@ -156,7 +156,7 @@ function AdminPage() {
 
         {activeTab === "applications" && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-sss-navy-dark mb-4">Admin — Application Queue</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Admin — Application Queue</h2>
             
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
               <div className="flex flex-wrap gap-2 text-xs uppercase">
@@ -164,7 +164,7 @@ function AdminPage() {
                   <button
                     key={s}
                     onClick={() => { setStatus(s); setVisibleAppsCount(getInitialVisibleCount()); }}
-                    className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
+                    className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-sss-form-border bg-sss-form-bg hover:bg-muted text-foreground"}`}
                   >
                     {s}
                   </button>
@@ -195,34 +195,34 @@ function AdminPage() {
             </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
-            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider shrink-0">
+          <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
+            <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
               Applications
             </div>
             <div className="p-0 overflow-auto flex-1 flex flex-col">
               {isLoading ? (
-                <div className="p-6 text-sm text-center text-gray-500">Loading…</div>
+                <div className="p-6 text-sm text-center text-muted-foreground">Loading…</div>
               ) : filteredRows.length === 0 ? (
-                <div className="p-6 text-sm text-center text-gray-500">No applications match your criteria.</div>
+                <div className="p-6 text-sm text-center text-muted-foreground">No applications match your criteria.</div>
               ) : (
                 <>
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b border-gray-200 text-left">
+                    <thead className="bg-sss-section-bg border-b border-sss-form-border text-left">
                       <tr>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">#</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Applicant</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Status</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">#</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Applicant</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-sss-form-border">
                       {filteredRows.slice(0, visibleAppsCount).map((r) => (
                         <tr
                           key={r.app_number}
                           onClick={() => setSelected(r.app_number)}
-                          className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-blue-50/80" : "hover:bg-gray-50"}`}
+                          className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-muted/80" : "hover:bg-muted/50"}`}
                         >
-                          <td className="px-4 py-3 font-mono text-gray-600">{r.app_number}</td>
-                          <td className="px-4 py-3 font-medium text-gray-800">{formatName(r.applicant_name)}</td>
+                          <td className="px-4 py-3 font-mono text-muted-foreground">{r.app_number}</td>
+                          <td className="px-4 py-3 font-medium text-foreground">{formatName(r.applicant_name)}</td>
                           <td className="px-4 py-3 uppercase text-xs">
                             <span className={statusBadge(r.status)}>{r.status}</span>
                           </td>
@@ -231,20 +231,20 @@ function AdminPage() {
                     </tbody>
                   </table>
                   {filteredRows.length > getInitialVisibleCount() && (
-                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
+                    <div className="p-3 bg-sss-section-bg border-t border-sss-form-border flex justify-center mt-auto shrink-0">
                       {visibleAppsCount < filteredRows.length ? (
                         <button 
                           onClick={() => setVisibleAppsCount(prev => prev + 10)}
-                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
                         >
-                          Show More <span className="text-gray-400">▼</span>
+                          Show More <span className="text-muted-foreground/60">▼</span>
                         </button>
                       ) : (
                         <button 
                           onClick={() => setVisibleAppsCount(getInitialVisibleCount())}
-                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
                         >
-                          Show Less <span className="text-gray-400">▲</span>
+                          Show Less <span className="text-muted-foreground/60">▲</span>
                         </button>
                       )}
                     </div>
@@ -254,8 +254,8 @@ function AdminPage() {
             </div>
           </div>
 
-          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
-            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
+          <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider">
               Review
             </div>
             <div className="p-6 flex-1 min-h-[60vh] flex flex-col">
@@ -328,37 +328,37 @@ function AdminPage() {
         )}
 
         {activeTab === "users" && (
-          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
-            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider shrink-0">
+          <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
+            <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
               Registered Users
             </div>
             <div className="p-0 overflow-auto flex-1 flex flex-col">
               {loadingUsers ? (
-                <div className="p-6 text-sm text-center text-gray-500">Loading users…</div>
+                <div className="p-6 text-sm text-center text-muted-foreground">Loading users…</div>
               ) : users.length === 0 ? (
-                <div className="p-6 text-sm text-center text-gray-500">No users found.</div>
+                <div className="p-6 text-sm text-center text-muted-foreground">No users found.</div>
               ) : (
                 <>
                   <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-sss-section-bg border-b border-sss-form-border">
                       <tr>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Name</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Email</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Phone</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Birthdate</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500 w-32">Role</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Name</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Email</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Phone</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Birthdate</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label w-32">Role</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-sss-form-border">
                       {users.slice(0, visibleUsersCount).map((u: any) => (
-                        <tr key={u.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 font-medium text-gray-800">{u.first_name} {u.last_name}</td>
-                          <td className="px-4 py-3 text-gray-600">{u.email}</td>
-                          <td className="px-4 py-3 text-gray-600">{u.phone || "—"}</td>
-                          <td className="px-4 py-3 text-gray-600">{u.birthdate || "—"}</td>
+                        <tr key={u.id} className="hover:bg-muted/50">
+                          <td className="px-4 py-3 font-medium text-foreground">{u.first_name} {u.last_name}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{u.phone || "—"}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{u.birthdate || "—"}</td>
                           <td className="px-4 py-3">
                             <select 
-                              className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}`}
+                              className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-primary/20 text-primary border-primary/30' : ''}`}
                               value={u.role}
                               disabled={roleMutation.isPending && roleMutation.variables?.userId === u.id}
                               onChange={(e) => roleMutation.mutate({ userId: u.id, role: e.target.value as "admin" | "user" })}
@@ -372,20 +372,20 @@ function AdminPage() {
                     </tbody>
                   </table>
                   {users.length > getInitialVisibleCount() && (
-                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
+                    <div className="p-3 bg-sss-section-bg border-t border-sss-form-border flex justify-center mt-auto shrink-0">
                       {visibleUsersCount < users.length ? (
                         <button 
                           onClick={() => setVisibleUsersCount(prev => prev + 10)}
-                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
                         >
-                          Show More <span className="text-gray-400">▼</span>
+                          Show More <span className="text-muted-foreground/60">▼</span>
                         </button>
                       ) : (
                         <button 
                           onClick={() => setVisibleUsersCount(getInitialVisibleCount())}
-                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
                         >
-                          Show Less <span className="text-gray-400">▲</span>
+                          Show Less <span className="text-muted-foreground/60">▲</span>
                         </button>
                       )}
                     </div>
