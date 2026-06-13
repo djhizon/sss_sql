@@ -53,13 +53,14 @@ const COUNTRIES = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
 ];
 
-function Field({ label, hint, required, children, className = "" }: { label: string; hint?: string; required?: boolean; children: React.ReactNode; className?: string; }) {
+function Field({ label, hint, required, children, className = "", error }: { label: string; hint?: string; required?: boolean; children: React.ReactNode; className?: string; error?: string }) {
   return (
     <div className={className}>
       <label className="sss-label flex items-baseline">
         {label} {required && <span className="text-red-500 font-bold ml-0.5 mr-1">*</span>} {hint && <span className="sss-hint ml-1">{hint}</span>}
       </label>
       {children}
+      {error && <div className="text-red-500 text-[11px] font-bold mt-1.5 uppercase tracking-wide animate-in fade-in slide-in-from-top-1">{error}</div>}
     </div>
   );
 }
@@ -74,6 +75,63 @@ function ApplyPage() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [nextAppNumber, setNextAppNumber] = useState<string>("Loading...");
   const [mounted, setMounted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  function getErrors(isSubmitting: boolean = false) {
+    const errs: Partial<Record<keyof ApplicationInput, string>> = {};
+    const checkDig = (k: keyof ApplicationInput, length: number, name: string, req: boolean = false) => {
+      const val = form[k] as string;
+      const digits = (val || "").replace(/-/g, "").trim();
+      if (req && isSubmitting && digits.length === 0) errs[k] = `${name} is required.`;
+      else if (digits.length > 0 && digits.length !== length) errs[k] = `Must be exactly ${length} digits. (Currently ${digits.length})`;
+    };
+
+    checkDig("ap_ss_num", 10, "SS Number", true);
+    checkDig("ap_crn", 12, "CRN", false);
+    checkDig("ap_taxpayer_id_number", 12, "Taxpayer ID", false);
+    checkDig("ap_mobile_no", 11, "Mobile Number", true);
+    checkDig("sp_ss_num", 10, "SS Number", false);
+    checkDig("sp_taxpayerid", 12, "Taxpayer ID", false);
+    checkDig("sp_employernum", 13, "Employer Number", false);
+    checkDig("sp_employertaxid", 12, "Employer Tax ID", false);
+    checkDig("ap_employer_num", 13, "Employer Number", true);
+    checkDig("ap_employer_taxid", 12, "Taxpayer ID", true);
+
+    if (form.ap_dob) {
+      const birthDate = new Date(form.ap_dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+      if (age < 18 || age > 60) {
+        errs.ap_dob = `Applicant must be between 18 and 60 years old. (Current age: ${age})`;
+      }
+    } else if (isSubmitting) {
+      errs.ap_dob = "Date of Birth is required.";
+    }
+
+    if (form.ap_local_address) {
+      const parts = form.ap_local_address.split(",").map(s => s.trim());
+      const pc = parts[parts.length - 1] || "";
+      if (!/^\d{4}$/.test(pc)) {
+        errs.ap_local_address = "Local Address must end with exactly a 4-digit postal code.";
+      }
+    } else if (isSubmitting) {
+      errs.ap_local_address = "Local Address is required.";
+    }
+
+    if (isSubmitting) {
+      if (!form.applicant_name) errs.applicant_name = "Full Name is required.";
+      if (!form.ap_email_add) errs.ap_email_add = "Email Address is required.";
+      if (!form.ap_occupation) errs.ap_occupation = "Occupation is required.";
+      if (!form.ap_employer_name) errs.ap_employer_name = "Employer Name is required.";
+      if (!form.ap_employer_address) errs.ap_employer_address = "Employer Address is required.";
+      if (!form.ap_employer_tel_no) errs.ap_employer_tel_no = "Employer Telephone is required.";
+    }
+    return errs;
+  }
+
+  const errors = getErrors(submitted);
 
   useEffect(() => {
     setMounted(true);
@@ -246,81 +304,12 @@ function ApplyPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Required simple fields
-    const requiredFields = {
-      "SS Number": form.ap_ss_num,
-      "Date of Birth": form.ap_dob,
-      "Full Name": form.applicant_name,
-      "Mobile Number": form.ap_mobile_no,
-      "Local Address": form.ap_local_address,
-      "Email Address": form.ap_email_add,
-      "Employer Number": form.ap_employer_num,
-      "Employer Taxpayer ID Number": form.ap_employer_taxid,
-      "Occupation": form.ap_occupation,
-      "Employer Name": form.ap_employer_name,
-      "Employer Address": form.ap_employer_address,
-      "Employer Telephone": form.ap_employer_tel_no,
-      "Employer Email": form.ap_employer_email_add,
-    };
-    for (const [name, val] of Object.entries(requiredFields)) {
-      if (!val || String(val).trim() === "") {
-        toast.error(`${name} is required.`);
-        return;
-      }
-    }
-
-    // Digit length validations (stripping dashes)
-    const checkDigits = (name: string, val: string | undefined | null, length: number, required: boolean = false) => {
-      if (!val && !required) return null;
-      const digits = (val || "").replace(/-/g, "").trim();
-      if (digits.length > 0 && !/^\d+$/.test(digits)) {
-        return `${name} must contain only numbers.`;
-      }
-      if (digits.length > 0 && digits.length !== length) {
-        return `${name} must be exactly ${length} digits. (Currently ${digits.length})`;
-      }
-      if (required && digits.length !== length) {
-        return `${name} is required and must be exactly ${length} digits.`;
-      }
-      return null;
-    };
-
-    const digitErrors = [
-      checkDigits("Applicant SS Number", form.ap_ss_num, 10, true),
-      checkDigits("Applicant Taxpayer ID", form.ap_taxpayer_id_number, 12, false),
-      checkDigits("Applicant Mobile Number", form.ap_mobile_no, 11, true),
-      checkDigits("Spouse SS Number", form.sp_ss_num, 10, false),
-      checkDigits("Spouse Taxpayer ID", form.sp_taxpayerid, 12, false),
-      checkDigits("Spouse Employer Number", form.sp_employernum, 13, false),
-      checkDigits("Spouse Employer Tax ID", form.sp_employertaxid, 12, false),
-      checkDigits("Employer Number", form.ap_employer_num, 13, true),
-      checkDigits("Employer Taxpayer ID", form.ap_employer_taxid, 12, true),
-    ].filter(Boolean);
-
-    if (digitErrors.length > 0) {
-      toast.error(digitErrors[0] as string);
-      return;
-    }
-
-    if (form.ap_dob) {
-      const birthDate = new Date(form.ap_dob);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-      if (age < 18 || age > 60) {
-        toast.error(`Applicant must be between 18 and 60 years old. Current age: ${age}`);
-        return;
-      }
-    }
+    setSubmitted(true);
     
-    if (form.ap_local_address) {
-      const parts = form.ap_local_address.split(",").map(s => s.trim());
-      const pc = parts[parts.length - 1] || "";
-      if (!/^\d{4}$/.test(pc)) {
-        toast.error("Local Address must end with exactly a 4-digit postal code (e.g. '1630').");
-        return;
-      }
+    const submitErrors = getErrors(true);
+    if (Object.keys(submitErrors).length > 0) {
+      toast.error("Please fix the highlighted errors on the form.");
+      return;
     }
 
     const payload = { ...form };
@@ -417,21 +406,21 @@ function ApplyPage() {
               A. Principal Applicant's Information
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Field label="SS Number" required className="md:col-span-4">
+              <Field label="SS Number" required className="md:col-span-4" error={errors.ap_ss_num}>
                 <DigitBoxes format="##-#######-#" value={form.ap_ss_num} onChange={(v) => set("ap_ss_num", v)} required />
               </Field>
-              <Field label="Common Reference No." className="md:col-span-4">
+              <Field label="Common Reference No." className="md:col-span-4" error={errors.ap_crn}>
                 <DigitBoxes format="####-#######-#" value={form.ap_crn} onChange={(v) => set("ap_crn", v)} />
               </Field>
 
-              <Field label="Date of Birth" hint="(YYYY-MM-DD)" required>
+              <Field label="Date of Birth" hint="(YYYY-MM-DD)" required error={errors.ap_dob}>
                 <input type="date" required className="sss-input" value={form.ap_dob} onChange={(e) => set("ap_dob", e.target.value)} />
               </Field>
-              <Field label="Taxpayer ID No." className="md:col-span-3">
+              <Field label="Taxpayer ID No." className="md:col-span-3" error={errors.ap_taxpayer_id_number}>
                 <DigitBoxes format="###-###-###-###" value={form.ap_taxpayer_id_number} onChange={(v) => set("ap_taxpayer_id_number", v)} />
               </Field>
 
-              <Field label="Full Name" hint="(LAST, FIRST, MIDDLE, SUFFIX)" className="md:col-span-4" required>
+              <Field label="Full Name" hint="(LAST, FIRST, MIDDLE, SUFFIX)" className="md:col-span-4" required error={errors.applicant_name}>
                 <SplitName value={form.applicant_name} onChange={(v) => set("applicant_name", v)} required />
               </Field>
 
@@ -449,16 +438,16 @@ function ApplyPage() {
                   <option value="SE">Separated</option>
                 </select>
               </Field>
-              <Field label="Mobile Number" className="md:col-span-4 lg:col-span-2" required>
+              <Field label="Mobile Number" className="md:col-span-4 lg:col-span-2" required error={errors.ap_mobile_no}>
                 <DigitBoxes format="####-#######" value={form.ap_mobile_no} onChange={(v) => set("ap_mobile_no", v)} required />
               </Field>
 
-              <Field label="Local Address" className="md:col-span-4" required>
+              <Field label="Local Address" className="md:col-span-4" required error={errors.ap_local_address}>
                 <SplitAddress isLocalAddress={true} value={form.ap_local_address} onChange={(v) => set("ap_local_address", v)} required />
               </Field>
 
-              <Field label="Telephone No." hint="(area + tel)">{input("ap_tel_no", { type: "tel", maxLength: 20 })}</Field>
-              <Field label="Email Address" className="md:col-span-2" required>{input("ap_email_add", { type: "email", required: true })}</Field>
+              <Field label="Telephone No." hint="(area + tel)" error={errors.ap_tel_no}>{input("ap_tel_no", { type: "tel", maxLength: 20 })}</Field>
+              <Field label="Email Address" className="md:col-span-2" required error={errors.ap_email_add}>{input("ap_email_add", { type: "email", required: true })}</Field>
               
               <Field label="Foreign Address" hint="(for Overseas Filipino Worker)" className="md:col-span-4">
                 <SplitAddress value={form.ap_foreign_address || ""} onChange={(v) => set("ap_foreign_address", v)} />
@@ -502,26 +491,26 @@ function ApplyPage() {
               B. Spouse of Principal Applicant's Information (If Applicable)
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Field label="SS Number" className="md:col-span-4 lg:col-span-2">
+              <Field label="SS Number" className="md:col-span-4 lg:col-span-2" error={errors.sp_ss_num}>
                 <DigitBoxes format="##-#######-#" value={form.sp_ss_num || ""} onChange={(v) => set("sp_ss_num", v)} />
               </Field>
-              <Field label="Common Reference No." className="md:col-span-4 lg:col-span-2">
+              <Field label="Common Reference No." className="md:col-span-4 lg:col-span-2" error={errors.sp_crn}>
                 <DigitBoxes format="####-#######-#" value={form.sp_crn || ""} onChange={(v) => set("sp_crn", v)} />
               </Field>
 
               <Field label="Date of Birth" hint="(YYYY-MM-DD)">
                 <input type="date" className="sss-input" value={form.sp_dob} onChange={(e) => set("sp_dob", e.target.value)} />
               </Field>
-              <Field label="Taxpayer ID No." className="md:col-span-3">
+              <Field label="Taxpayer ID No." className="md:col-span-3" error={errors.sp_taxpayerid}>
                 <DigitBoxes format="###-###-###-###" value={form.sp_taxpayerid || ""} onChange={(v) => set("sp_taxpayerid", v)} />
               </Field>
               <Field label="Spouse Full Name" className="md:col-span-4">
                 <SplitName value={form.spouse_name || ""} onChange={(v) => set("spouse_name", v)} />
               </Field>
-              <Field label="Employer Number" className="md:col-span-4 lg:col-span-2">
+              <Field label="Employer Number" className="md:col-span-4 lg:col-span-2" error={errors.sp_employernum}>
                 <DigitBoxes format="##-########-###" value={form.sp_employernum || ""} onChange={(v) => set("sp_employernum", v)} />
               </Field>
-              <Field label="Employer Tax ID" className="md:col-span-4 lg:col-span-2">
+              <Field label="Employer Tax ID" className="md:col-span-4 lg:col-span-2" error={errors.sp_employertaxid}>
                 <DigitBoxes format="###-###-###-###" value={form.sp_employertaxid || ""} onChange={(v) => set("sp_employertaxid", v)} />
               </Field>
               <Field label="Type of Employer" className="md:col-span-4 lg:col-span-2">
@@ -538,10 +527,10 @@ function ApplyPage() {
               C. Principal Applicant's Employer Information
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Field label="Employer Number" required className="md:col-span-4 lg:col-span-2">
+              <Field label="Employer Number" required className="md:col-span-4 lg:col-span-2" error={errors.ap_employer_num}>
                 <DigitBoxes format="##-########-###" value={form.ap_employer_num || ""} onChange={(v) => set("ap_employer_num", v)} required />
               </Field>
-              <Field label="Taxpayer ID Number" required className="md:col-span-4 lg:col-span-2">
+              <Field label="Taxpayer ID Number" required className="md:col-span-4 lg:col-span-2" error={errors.ap_employer_taxid}>
                 <DigitBoxes format="###-###-###-###" value={form.ap_employer_taxid || ""} onChange={(v) => set("ap_employer_taxid", v)} required />
               </Field>
               <Field label="Type of Employer" required>
@@ -550,13 +539,13 @@ function ApplyPage() {
                   <option value="H">Household</option>
                 </select>
               </Field>
-              <Field label="Occupation / Position" required className="md:col-span-3">{input("ap_occupation", { required: true })}</Field>
-              <Field label="Employer Name" required className="md:col-span-4">{input("ap_employer_name", { required: true })}</Field>
-              <Field label="Employer Address" required className="md:col-span-4">
+              <Field label="Occupation / Position" required className="md:col-span-3" error={errors.ap_occupation}>{input("ap_occupation", { required: true })}</Field>
+              <Field label="Employer Name" required className="md:col-span-4" error={errors.ap_employer_name}>{input("ap_employer_name", { required: true })}</Field>
+              <Field label="Employer Address" required className="md:col-span-4" error={errors.ap_employer_address}>
                 <SplitAddress value={form.ap_employer_address || ""} onChange={(v) => set("ap_employer_address", v)} required />
               </Field>
-              <Field label="Telephone No." required>{input("ap_employer_tel_no", { type: "tel", maxLength: 20, required: true })}</Field>
-              <Field label="Email Address" required className="md:col-span-2">{input("ap_employer_email_add", { type: "email", required: true })}</Field>
+              <Field label="Telephone No." required error={errors.ap_employer_tel_no}>{input("ap_employer_tel_no", { type: "tel", maxLength: 20, required: true })}</Field>
+              <Field label="Email Address" required className="md:col-span-2" error={errors.ap_email_add}>{input("ap_employer_email_add", { type: "email", required: true })}</Field>
               <Field label="Website">{input("ap_employer_website", { forceLowercase: true })}</Field>
             </div>
 
