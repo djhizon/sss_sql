@@ -226,12 +226,12 @@ function ApplyPage() {
       sp_dob: formatDate(rowData["SP_DOB"]),
       sp_taxpayerid: cleanDigits(rowData["SP_TAXPAYERID"], 12),
       spouse_name: parseSmartName(rowData["SPOUSE_NAME"]),
-      sp_employernum: cleanDigits(rowData["SP_EMPLOYERNUM"], 10),
+      sp_employernum: cleanDigits(rowData["SP_EMPLOYERNUM"], 13),
       sp_employertaxid: cleanDigits(rowData["SP_EMPLOYERTAXID"], 12),
       sp_typeofemployer: (rowData["SP_TYPEOFEMPLOYER"] === "N/A" || !rowData["SP_TYPEOFEMPLOYER"]) ? "" : (rowData["SP_TYPEOFEMPLOYER"] as "B" | "H"),
       sp_employername: rowData["SP_EMPLOYERNAME"] || "",
       
-      ap_employer_num: cleanDigits(rowData["AP_EMPLOYER_NUM"], 10),
+      ap_employer_num: cleanDigits(rowData["AP_EMPLOYER_NUM"], 13),
       ap_employer_taxid: cleanDigits(rowData["AP_EMPLOYER_TAXID"], 12),
       ap_typeofemployer: (rowData["AP_TYPEOFEMPLOYER"] === "N/A" || !rowData["AP_TYPEOFEMPLOYER"]) ? "B" : (rowData["AP_TYPEOFEMPLOYER"] as "B" | "H"),
       ap_employer_name: rowData["AP_EMPLOYER_NAME"] || "",
@@ -288,9 +288,9 @@ function ApplyPage() {
       checkDigits("Applicant Mobile Number", form.ap_mobile_no, 11, true),
       checkDigits("Spouse SS Number", form.sp_ss_num, 10, false),
       checkDigits("Spouse Taxpayer ID", form.sp_taxpayerid, 12, false),
-      checkDigits("Spouse Employer Number", form.sp_employernum, 10, false),
+      checkDigits("Spouse Employer Number", form.sp_employernum, 13, false),
       checkDigits("Spouse Employer Tax ID", form.sp_employertaxid, 12, false),
-      checkDigits("Employer Number", form.ap_employer_num, 10, true),
+      checkDigits("Employer Number", form.ap_employer_num, 13, true),
       checkDigits("Employer Taxpayer ID", form.ap_employer_taxid, 12, true),
     ].filter(Boolean);
 
@@ -514,7 +514,7 @@ function ApplyPage() {
                 <SplitName value={form.spouse_name || ""} onChange={(v) => set("spouse_name", v)} />
               </Field>
               <Field label="Employer Number" className="md:col-span-4 lg:col-span-2">
-                <DigitBoxes format="##-#######-#" value={form.sp_employernum || ""} onChange={(v) => set("sp_employernum", v)} />
+                <DigitBoxes format="##-########-###" value={form.sp_employernum || ""} onChange={(v) => set("sp_employernum", v)} />
               </Field>
               <Field label="Employer Tax ID" className="md:col-span-4 lg:col-span-2">
                 <DigitBoxes format="###-###-###-###" value={form.sp_employertaxid || ""} onChange={(v) => set("sp_employertaxid", v)} />
@@ -534,7 +534,7 @@ function ApplyPage() {
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
               <Field label="Employer Number" required className="md:col-span-4 lg:col-span-2">
-                <DigitBoxes format="##-#######-#" value={form.ap_employer_num || ""} onChange={(v) => set("ap_employer_num", v)} required />
+                <DigitBoxes format="##-########-###" value={form.ap_employer_num || ""} onChange={(v) => set("ap_employer_num", v)} required />
               </Field>
               <Field label="Taxpayer ID Number" required className="md:col-span-4 lg:col-span-2">
                 <DigitBoxes format="###-###-###-###" value={form.ap_employer_taxid || ""} onChange={(v) => set("ap_employer_taxid", v)} required />
