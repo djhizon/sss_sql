@@ -47,37 +47,37 @@ function Dashboard() {
           </Link>
         </div>
 
-        <div className="border border-sss-form-border bg-white shadow-sm rounded-xl overflow-hidden mt-2 flex-1 flex flex-col h-full">
-          <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
+        <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden mt-2 flex-1 flex flex-col h-full">
+          <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
             Application History
           </div>
           <div className="p-0 flex-1 flex flex-col overflow-hidden">
             {isLoading ? (
-              <div className="p-8 text-center text-sm text-gray-500">Loading your applications…</div>
+              <div className="p-8 text-center text-sm text-muted-foreground">Loading your applications…</div>
             ) : apps.length === 0 ? (
-              <div className="p-12 text-center text-sm text-gray-500">
-                <p className="text-lg font-medium text-gray-700 mb-2">No applications found</p>
+              <div className="p-12 text-center text-sm text-muted-foreground">
+                <p className="text-lg font-medium text-foreground mb-2">No applications found</p>
                 No applications yet. Click "New Application" to begin.
               </div>
             ) : (
               <>
                 <div className="overflow-auto flex-1">
                   <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-sss-section-bg border-b border-sss-form-border">
                     <tr className="text-left">
-                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">App Number</th>
-                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">Applicant</th>
-                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">Submitted</th>
-                      <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-sss-label tracking-wider">App Number</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-sss-label tracking-wider">Applicant</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-sss-label tracking-wider">Submitted</th>
+                      <th className="px-6 py-3 text-xs uppercase font-bold text-sss-label tracking-wider">Status</th>
                       <th className="px-6 py-3"></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-sss-form-border">
                     {apps.slice(0, visibleCount).map((a) => (
-                      <tr key={a.app_number} className="hover:bg-blue-50/50 transition-colors">
-                        <td className="px-6 py-4 font-mono text-gray-700 font-medium">{String(a.app_number).padStart(12, '0')}</td>
-                        <td className="px-6 py-4 text-gray-800">{formatName(a.applicant_name)}</td>
-                        <td className="px-6 py-4 text-gray-500">
+                      <tr key={a.app_number} className="hover:bg-muted/50 transition-colors">
+                        <td className="px-6 py-4 font-mono text-foreground font-medium">{String(a.app_number).padStart(12, '0')}</td>
+                        <td className="px-6 py-4 text-foreground">{formatName(a.applicant_name)}</td>
+                        <td className="px-6 py-4 text-muted-foreground">
                           {new Date(a.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4">
@@ -98,20 +98,20 @@ function Dashboard() {
                 </table>
                 </div>
                 {apps.length > getInitialVisibleCount() && (
-                  <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
+                  <div className="p-3 bg-sss-section-bg border-t border-sss-form-border flex justify-center mt-auto shrink-0">
                     {visibleCount < apps.length ? (
                       <button 
                         onClick={() => setVisibleCount(prev => prev + 10)}
-                        className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                        className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
                       >
-                        Show More <span className="text-gray-400">▼</span>
+                        Show More <span className="text-muted-foreground/60">▼</span>
                       </button>
                     ) : (
                       <button 
                         onClick={() => setVisibleCount(getInitialVisibleCount())}
-                        className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                        className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
                       >
-                        Show Less <span className="text-gray-400">▲</span>
+                        Show Less <span className="text-muted-foreground/60">▲</span>
                       </button>
                     )}
                   </div>
