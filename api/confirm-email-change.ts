@@ -9,9 +9,9 @@ export default async function handler(req: Request) {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
     
-    const vercelDomain = process.env.VITE_VERCEL_PROJECT_PRODUCTION_URL 
-      ? `https://${process.env.VITE_VERCEL_PROJECT_PRODUCTION_URL}` 
-      : 'http://localhost:5173';
+    const host = req.headers.get('host') || 'localhost:5173';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const vercelDomain = `${protocol}://${host}`;
 
     if (!token) {
       return Response.redirect(`${vercelDomain}/settings?error=MissingToken`, 302);

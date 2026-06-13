@@ -34,9 +34,9 @@ export default async function handler(req: Request) {
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const vercelDomain = process.env.VITE_VERCEL_PROJECT_PRODUCTION_URL 
-      ? `https://${process.env.VITE_VERCEL_PROJECT_PRODUCTION_URL}` 
-      : 'http://localhost:5173';
+    const host = req.headers.get('host') || 'localhost:5173';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const vercelDomain = `${protocol}://${host}`;
 
     if (!supabaseUrl || !supabaseServiceKey) {
       return new Response(JSON.stringify({ error: 'Server configuration missing service key' }), { status: 500 });

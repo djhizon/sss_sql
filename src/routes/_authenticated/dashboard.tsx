@@ -41,7 +41,7 @@ function Dashboard() {
             to="/apply"
             className="px-5 py-2.5 bg-[#0038a8] text-white text-sm font-bold uppercase tracking-wide hover:bg-[#002879] rounded-md shadow-sm hover:shadow transition-all"
           >
-            + New Application
+            New Application
           </Link>
         </div>
 
