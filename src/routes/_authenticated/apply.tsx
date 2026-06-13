@@ -82,8 +82,15 @@ function ApplyPage() {
     const checkDig = (k: keyof ApplicationInput, length: number, name: string, req: boolean = false) => {
       const val = form[k] as string;
       const digits = (val || "").replace(/-/g, "").trim();
-      if (req && isSubmitting && digits.length === 0) errs[k] = `${name} is required.`;
-      else if (digits.length > 0 && digits.length !== length) errs[k] = `Must be exactly ${length} digits. (Currently ${digits.length})`;
+      if (req && isSubmitting && digits.length === 0) {
+        errs[k] = `${name} is required.`;
+      } else if (digits.length > 0) {
+        if (k === "ap_mobile_no" && !digits.startsWith("09".substring(0, digits.length))) {
+          errs[k] = "Mobile Number must start with 09.";
+        } else if (digits.length !== length) {
+          errs[k] = `Must be exactly ${length} digits. (Currently ${digits.length})`;
+        }
+      }
     };
 
     checkDig("ap_ss_num", 10, "SS Number", true);
