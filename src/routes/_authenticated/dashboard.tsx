@@ -12,7 +12,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
+  const getInitialVisibleCount = () => typeof window !== "undefined" && window.innerWidth >= 768 ? 15 : 10;
   const [user, setUser] = useState<{ email?: string | null } | null>(null);
+  const [visibleCount, setVisibleCount] = useState(getInitialVisibleCount);
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
@@ -29,7 +31,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <SssHeader user={user} isAdmin={adminData?.isAdmin} />
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6 flex flex-col">
         <div className="flex justify-between items-end mb-4">
           <div>
             <h2 className="text-xl font-bold text-sss-navy-dark">My Housing Loan Applications</h2>
@@ -45,11 +47,11 @@ function Dashboard() {
           </Link>
         </div>
 
-        <div className="border border-sss-form-border bg-white shadow-sm rounded-xl overflow-hidden mt-2">
-          <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider">
+        <div className="border border-sss-form-border bg-white shadow-sm rounded-xl overflow-hidden mt-2 flex-1 flex flex-col h-full">
+          <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
             Application History
           </div>
-          <div className="p-0">
+          <div className="p-0 flex-1 flex flex-col overflow-hidden">
             {isLoading ? (
               <div className="p-8 text-center text-sm text-gray-500">Loading your applications…</div>
             ) : apps.length === 0 ? (
@@ -58,8 +60,9 @@ function Dashboard() {
                 No applications yet. Click "New Application" to begin.
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+              <>
+                <div className="overflow-auto flex-1">
+                  <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr className="text-left">
                       <th className="px-6 py-3 text-xs uppercase font-bold text-gray-500 tracking-wider">App Number</th>
@@ -70,7 +73,7 @@ function Dashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {apps.map((a) => (
+                    {apps.slice(0, visibleCount).map((a) => (
                       <tr key={a.app_number} className="hover:bg-blue-50/50 transition-colors">
                         <td className="px-6 py-4 font-mono text-gray-700 font-medium">{String(a.app_number).padStart(12, '0')}</td>
                         <td className="px-6 py-4 text-gray-800">{formatName(a.applicant_name)}</td>
@@ -93,7 +96,27 @@ function Dashboard() {
                     ))}
                   </tbody>
                 </table>
-              </div>
+                </div>
+                {apps.length > getInitialVisibleCount() && (
+                  <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
+                    {visibleCount < apps.length ? (
+                      <button 
+                        onClick={() => setVisibleCount(prev => prev + 10)}
+                        className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                      >
+                        Show More <span className="text-gray-400">▼</span>
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => setVisibleCount(getInitialVisibleCount())}
+                        className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
+                      >
+                        Show Less <span className="text-gray-400">▲</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
