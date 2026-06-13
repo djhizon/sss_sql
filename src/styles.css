@@ -145,10 +145,11 @@
 
 @utility sss-input {
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--sss-form-border);
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  background-color: white;
+  background-color: var(--sss-form-bg);
+  color: var(--foreground);
   padding: 0.35rem 0.5rem;
   font-size: 0.85rem;
   font-family: var(--font-form);
