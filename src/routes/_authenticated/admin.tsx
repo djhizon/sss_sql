@@ -33,8 +33,9 @@ function AdminPage() {
   const [notes, setNotes] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"date_desc" | "date_asc" | "alpha_asc" | "alpha_desc">("date_desc");
-  const [visibleAppsCount, setVisibleAppsCount] = useState(10);
-  const [visibleUsersCount, setVisibleUsersCount] = useState(10);
+  const getInitialVisibleCount = () => typeof window !== "undefined" && window.innerWidth >= 768 ? 15 : 10;
+  const [visibleAppsCount, setVisibleAppsCount] = useState(getInitialVisibleCount);
+  const [visibleUsersCount, setVisibleUsersCount] = useState(getInitialVisibleCount);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -162,7 +163,7 @@ function AdminPage() {
                 {(["pending", "approved", "rejected", "all"] as StatusFilter[]).map((s) => (
                   <button
                     key={s}
-                    onClick={() => { setStatus(s); setVisibleAppsCount(10); }}
+                    onClick={() => { setStatus(s); setVisibleAppsCount(getInitialVisibleCount()); }}
                     className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
                   >
                     {s}
@@ -176,7 +177,7 @@ function AdminPage() {
                   <ClearableInput 
                     placeholder="Search Name or App #..." 
                     value={searchTerm}
-                    onChange={(val) => { setSearchTerm(val); setVisibleAppsCount(10); }}
+                    onChange={(val) => { setSearchTerm(val); setVisibleAppsCount(getInitialVisibleCount()); }}
                     className="sss-input text-sm py-1.5 pl-9 w-full"
                   />
                 </div>
@@ -194,11 +195,11 @@ function AdminPage() {
             </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
-            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider shrink-0">
               Applications
             </div>
-            <div className="p-0 max-h-[60vh] overflow-auto">
+            <div className="p-0 overflow-auto flex-1 flex flex-col">
               {isLoading ? (
                 <div className="p-6 text-sm text-center text-gray-500">Loading…</div>
               ) : filteredRows.length === 0 ? (
@@ -229,8 +230,8 @@ function AdminPage() {
                       ))}
                     </tbody>
                   </table>
-                  {filteredRows.length > 10 && (
-                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center">
+                  {filteredRows.length > getInitialVisibleCount() && (
+                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
                       {visibleAppsCount < filteredRows.length ? (
                         <button 
                           onClick={() => setVisibleAppsCount(prev => prev + 10)}
@@ -240,7 +241,7 @@ function AdminPage() {
                         </button>
                       ) : (
                         <button 
-                          onClick={() => setVisibleAppsCount(10)}
+                          onClick={() => setVisibleAppsCount(getInitialVisibleCount())}
                           className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
                         >
                           Show Less <span className="text-gray-400">▲</span>
@@ -327,11 +328,11 @@ function AdminPage() {
         )}
 
         {activeTab === "users" && (
-          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
-            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider shrink-0">
               Registered Users
             </div>
-            <div className="p-0 overflow-auto">
+            <div className="p-0 overflow-auto flex-1 flex flex-col">
               {loadingUsers ? (
                 <div className="p-6 text-sm text-center text-gray-500">Loading users…</div>
               ) : users.length === 0 ? (
@@ -370,8 +371,8 @@ function AdminPage() {
                       ))}
                     </tbody>
                   </table>
-                  {users.length > 10 && (
-                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center">
+                  {users.length > getInitialVisibleCount() && (
+                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
                       {visibleUsersCount < users.length ? (
                         <button 
                           onClick={() => setVisibleUsersCount(prev => prev + 10)}
@@ -381,7 +382,7 @@ function AdminPage() {
                         </button>
                       ) : (
                         <button 
-                          onClick={() => setVisibleUsersCount(10)}
+                          onClick={() => setVisibleUsersCount(getInitialVisibleCount())}
                           className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
                         >
                           Show Less <span className="text-gray-400">▲</span>
