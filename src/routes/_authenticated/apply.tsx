@@ -390,15 +390,15 @@ function ApplyPage() {
           </div>
         )}
 
-        <div className="border border-sss-form-border bg-white shadow-md rounded-xl overflow-hidden">
-          <div className="text-center py-6 border-b border-sss-form-border bg-gradient-to-b from-[#f8fafc] to-white">
+        <div className="border border-sss-form-border bg-sss-form-bg shadow-md rounded-xl overflow-hidden">
+          <div className="text-center py-6 border-b border-sss-form-border bg-sss-form-bg">
             <div className="text-xs text-sss-label font-semibold tracking-widest">REPUBLIC OF THE PHILIPPINES</div>
-            <div className="text-base font-bold tracking-widest text-gray-800">SOCIAL SECURITY SYSTEM</div>
-            <div className="text-xl md:text-2xl font-extrabold tracking-wider mt-2 mb-1 text-sss-navy">APPLICATION FOR HOUSING LOAN</div>
-            <div className="text-[10px] text-gray-400 font-medium">MEL-01750 (09-2022)</div>
+            <div className="text-base font-bold tracking-widest text-foreground">SOCIAL SECURITY SYSTEM</div>
+            <div className="text-xl md:text-2xl font-extrabold tracking-wider mt-2 mb-1 text-primary">APPLICATION FOR HOUSING LOAN</div>
+            <div className="text-[10px] text-sss-label font-medium">MEL-01750 (09-2022)</div>
             {mounted && (
-              <div className="text-sm font-bold mt-4 text-sss-navy-dark border border-gray-200 inline-block px-4 py-1.5 rounded-md bg-white shadow-sm">
-                Application No: <span className="text-sss-navy tracking-widest">{nextAppNumber}</span>
+              <div className="text-sm font-bold mt-4 text-foreground border border-sss-form-border inline-block px-4 py-1.5 rounded-md bg-sss-form-bg shadow-sm">
+                Application No: <span className="text-primary tracking-widest">{nextAppNumber}</span>
               </div>
             )}
           </div>
@@ -408,7 +408,7 @@ function ApplyPage() {
               Part I — To Be Filled Out by Member-Applicant
             </div>
 
-            <div className="bg-sss-section-bg text-sss-navy-dark text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
+            <div className="bg-sss-section-bg text-sss-label text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
               A. Principal Applicant's Information
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -473,7 +473,7 @@ function ApplyPage() {
                     placeholder="E.G. UNITED STATES"
                   />
                   {showCountryDropdown && filteredCountries.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-sss-form-border shadow-lg max-h-48 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-1 bg-sss-form-bg border border-sss-form-border shadow-lg max-h-48 overflow-y-auto">
                       {filteredCountries.map(c => (
                         <div
                           key={c}
@@ -493,7 +493,7 @@ function ApplyPage() {
               </Field>
             </div>
 
-            <div className="bg-sss-section-bg text-sss-navy-dark text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
+            <div className="bg-sss-section-bg text-sss-label text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
               B. Spouse of Principal Applicant's Information (If Applicable)
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -529,7 +529,7 @@ function ApplyPage() {
               <Field label="Employer Name" className="md:col-span-4 lg:col-span-2">{input("sp_employername")}</Field>
             </div>
 
-            <div className="bg-sss-section-bg text-sss-navy-dark text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
+            <div className="bg-sss-section-bg text-sss-label text-xs font-bold uppercase py-2.5 px-6 border-y border-sss-form-border tracking-wider shadow-sm">
               C. Principal Applicant's Employer Information
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -555,11 +555,11 @@ function ApplyPage() {
               <Field label="Website">{input("ap_employer_website", { forceLowercase: true })}</Field>
             </div>
 
-            <div className="p-6 border-t border-sss-form-border flex justify-end gap-3 bg-gray-50/80 mt-2 rounded-b-xl">
+            <div className="p-6 border-t border-sss-form-border flex justify-end gap-3 bg-sss-form-bg mt-2 rounded-b-xl">
               <button
                 type="button"
                 onClick={() => navigate({ to: "/dashboard" })}
-                className="px-6 py-2.5 bg-gray-200 text-gray-700 text-sm uppercase font-bold tracking-wider hover:bg-gray-300 transition-colors rounded-md"
+                className="px-6 py-2.5 bg-muted text-muted-foreground text-sm uppercase font-bold tracking-wider hover:bg-muted/80 transition-colors rounded-md"
               >
                 Cancel
               </button>

@@ -57,16 +57,16 @@ function ViewApp() {
         {isLoading && <div>Loading…</div>}
         {error && <div className="text-destructive">{(error as Error).message}</div>}
         {app && (
-          <div className="border-2 border-sss-form-border bg-white">
+          <div className="border-2 border-sss-form-border bg-sss-form-bg">
             <div className="text-center py-3 border-b-2 border-sss-form-border">
               <div className="text-xs text-sss-label">Republic of the Philippines</div>
-              <div className="text-base font-bold">SOCIAL SECURITY SYSTEM</div>
-              <div className="text-lg font-extrabold">APPLICATION FOR HOUSING LOAN</div>
-              <div className="mt-2 text-sm">
+              <div className="text-base font-bold text-foreground">SOCIAL SECURITY SYSTEM</div>
+              <div className="text-lg font-extrabold text-primary">APPLICATION FOR HOUSING LOAN</div>
+              <div className="mt-2 text-sm text-foreground">
                 <span className="sss-label inline">Application No.:</span>{" "}
                 <span className="font-mono text-base font-bold">{app.app_number}</span>
               </div>
-              <div className="mt-1 text-xs uppercase tracking-wider">
+              <div className="mt-1 text-xs uppercase tracking-wider text-foreground">
                 Status: <span className="font-bold">{app.status}</span>
               </div>
             </div>
