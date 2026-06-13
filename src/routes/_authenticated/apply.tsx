@@ -241,6 +241,59 @@ function ApplyPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Required simple fields
+    const requiredFields = {
+      "SS Number": form.ap_ss_num,
+      "Date of Birth": form.ap_dob,
+      "Full Name": form.applicant_name,
+      "Mobile Number": form.ap_mobile_no,
+      "Local Address": form.ap_local_address,
+      "Email Address": form.ap_email_add,
+      "Employer Number": form.ap_employer_num,
+      "Employer Taxpayer ID Number": form.ap_employer_taxid,
+      "Occupation": form.ap_occupation,
+      "Employer Name": form.ap_employer_name,
+      "Employer Address": form.ap_employer_address,
+      "Employer Telephone": form.ap_employer_tel_no,
+      "Employer Email": form.ap_employer_email_add,
+    };
+    for (const [name, val] of Object.entries(requiredFields)) {
+      if (!val || String(val).trim() === "") {
+        toast.error(`${name} is required.`);
+        return;
+      }
+    }
+
+    // Digit length validations (stripping dashes)
+    const checkDigits = (name: string, val: string | undefined | null, length: number, required: boolean = false) => {
+      if (!val && !required) return null;
+      const digits = (val || "").replace(/-/g, "").trim();
+      if (digits.length > 0 && digits.length !== length) {
+        return `${name} must be exactly ${length} digits. (Currently ${digits.length})`;
+      }
+      if (required && digits.length !== length) {
+        return `${name} is required and must be exactly ${length} digits.`;
+      }
+      return null;
+    };
+
+    const digitErrors = [
+      checkDigits("Applicant SS Number", form.ap_ss_num, 10, true),
+      checkDigits("Applicant Taxpayer ID", form.ap_taxpayer_id_number, 12, false),
+      checkDigits("Applicant Mobile Number", form.ap_mobile_no, 11, true),
+      checkDigits("Spouse SS Number", form.sp_ss_num, 10, false),
+      checkDigits("Spouse Taxpayer ID", form.sp_taxpayerid, 12, false),
+      checkDigits("Spouse Employer Number", form.sp_employernum, 10, false),
+      checkDigits("Spouse Employer Tax ID", form.sp_employertaxid, 12, false),
+      checkDigits("Employer Number", form.ap_employer_num, 10, true),
+      checkDigits("Employer Taxpayer ID", form.ap_employer_taxid, 12, true),
+    ].filter(Boolean);
+
+    if (digitErrors.length > 0) {
+      toast.error(digitErrors[0] as string);
+      return;
+    }
+
     if (form.ap_dob) {
       const birthDate = new Date(form.ap_dob);
       const today = new Date();
@@ -255,7 +308,7 @@ function ApplyPage() {
     
     if (form.ap_local_address) {
       const parts = form.ap_local_address.split(",").map(s => s.trim());
-      const pc = parts[7] || "";
+      const pc = parts[parts.length - 1] || "";
       if (!/^\d{4}$/.test(pc)) {
         toast.error("Local Address must end with exactly a 4-digit postal code (e.g. '1630').");
         return;
