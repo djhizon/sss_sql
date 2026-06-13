@@ -123,7 +123,7 @@ function SettingsPage() {
   ] as const;
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/50">
+    <div className="min-h-screen flex flex-col">
       <SssHeader user={user} isAdmin={adminData?.isAdmin} />
       
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
