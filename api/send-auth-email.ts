@@ -76,6 +76,13 @@ export default async function handler(req: Request) {
       actionLabel = "Confirm Email Change";
       subject = "Action Required: Confirm your email update";
       messagePrefix = "We received a request to change the email address associated with your SSS Member Services Portal account. Please click the button below to confirm this action.";
+    } else if (email_data.email_action_type === 'signup') {
+      actionLabel = "Verify Email Address";
+      subject = "Action Required: Confirm your SSS Member Portal Registration";
+      messagePrefix = "Thank you for registering at the SSS Member Services Portal. To complete your registration and secure your account, please confirm your email address by clicking the button below.";
+    } else {
+      console.log(`Ignoring unhandled email action type: ${email_data.email_action_type}`);
+      return new Response("Ignored unhandled action type", { status: 200 });
     }
 
     // 3. Construct Simple HTML Email Body

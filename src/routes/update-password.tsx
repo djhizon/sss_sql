@@ -52,6 +52,24 @@ function UpdatePasswordPage() {
     
     setLoading(true);
     try {
+      // First check if the new password is the same as the old password
+      const session = await supabase.auth.getSession();
+      const userEmail = session.data.session?.user?.email;
+      
+      if (userEmail) {
+        // We try to sign in with the NEW password. If it succeeds, it means the new password is the old password!
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: userEmail,
+          password: password,
+        });
+
+        if (!signInError) {
+          toast.error("Your new password cannot be the same as your old password.");
+          setLoading(false);
+          return;
+        }
+      }
+
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       
