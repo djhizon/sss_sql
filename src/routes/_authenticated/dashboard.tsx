@@ -34,7 +34,7 @@ function Dashboard() {
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6 flex flex-col">
         <div className="flex justify-between items-end mb-4">
           <div>
-            <h2 className="text-xl font-bold text-sss-navy-dark">My Housing Loan Applications</h2>
+            <h2 className="text-xl font-bold text-foreground">My Housing Loan Applications</h2>
             <p className="text-sm text-muted-foreground">
               Track the status of each submission. Application Number is assigned automatically.
             </p>

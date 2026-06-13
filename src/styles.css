@@ -110,7 +110,7 @@
   font-size: 0.85rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--sss-navy);
+  color: var(--foreground);
   border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
 }
