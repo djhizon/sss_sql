@@ -199,35 +199,40 @@ function ApplyPage() {
       return [room, house, street, sub, brgy, city, prov, zip].join(", ");
     };
 
+    const cleanDigits = (val: string, max: number) => {
+      if (!val || val === "N/A") return "";
+      return val.replace(/[^0-9]/g, "").slice(0, max);
+    };
+
     setNextAppNumber(String(rowData["APP_NUMBER"] || "000000000001").padStart(12, '0'));
 
     setForm({
-      ap_ss_num: rowData["AP_SS_NUM"] || "",
-      ap_crn: rowData["AP_CRN"] || "",
+      ap_ss_num: cleanDigits(rowData["AP_SS_NUM"], 10),
+      ap_crn: cleanDigits(rowData["AP_CRN"], 12),
       ap_dob: formatDate(rowData["AP_DOB"]),
-      ap_taxpayer_id_number: rowData["AP_TAXPAYER_ID_NUMBER"] || "",
+      ap_taxpayer_id_number: cleanDigits(rowData["AP_TAXPAYER_ID_NUMBER"], 12),
       applicant_name: parseSmartName(rowData["APPLICANT_NAME"]),
       ap_sex: (rowData["AP_SEX"] === "N/A" || !rowData["AP_SEX"]) ? "M" : (rowData["AP_SEX"] as "M" | "F"),
       ap_civil_status: (rowData["AP_CIVIL_STATUS"] === "N/A" || !rowData["AP_CIVIL_STATUS"]) ? "S" : (rowData["AP_CIVIL_STATUS"] as "S" | "M" | "W" | "SE"),
       ap_local_address: parseSmartAddress(rowData["Applicant's complete residential address in the Philippines. (RM./FLR./UNIT NO. & BLDG. NAME, HOUSE/LOT & BLK NO., STREET NAME, SUBDIVISION, BARANGAY/DISTRICT/LOCALITY, CITY/MUNICIPALITY, PROVINCE, POSTAL CODE (NNNN))"], true),
-      ap_tel_no: rowData["AP_TEL._NO."] || "",
-      ap_mobile_no: rowData["AP_MOBILE_NO."] || "",
+      ap_tel_no: cleanDigits(rowData["AP_TEL._NO."], 15),
+      ap_mobile_no: cleanDigits(rowData["AP_MOBILE_NO."], 11),
       ap_email_add: rowData["AP_EMAIL_ADD"] || "",
       ap_foreign_address: rowData["Applicant's foreign residential address. (RM./FLR./UNIT NO. & BLDG. NAME, HOUSE/LOT & BLK NO., STREET NAME, SUBDIVISION, BARANGAY/DISTRICT/LOCALITY, CITY/MUNICIPALITY, PROVINCE, POSTAL CODE) (FOR OVERSEAS FILIPINO WORKER)"] === "N/A" ? "" : parseSmartAddress(rowData["Applicant's foreign residential address. (RM./FLR./UNIT NO. & BLDG. NAME, HOUSE/LOT & BLK NO., STREET NAME, SUBDIVISION, BARANGAY/DISTRICT/LOCALITY, CITY/MUNICIPALITY, PROVINCE, POSTAL CODE) (FOR OVERSEAS FILIPINO WORKER)"], false),
       country: rowData["COUNTRY"] === "N/A" ? "" : rowData["COUNTRY"],
       
-      sp_ss_num: rowData["SP_SS_NUM"] || "",
-      sp_crn: rowData["SP_CRN"] || "",
+      sp_ss_num: cleanDigits(rowData["SP_SS_NUM"], 10),
+      sp_crn: cleanDigits(rowData["SP_CRN"], 12),
       sp_dob: formatDate(rowData["SP_DOB"]),
-      sp_taxpayerid: rowData["SP_TAXPAYERID"] || "",
+      sp_taxpayerid: cleanDigits(rowData["SP_TAXPAYERID"], 12),
       spouse_name: parseSmartName(rowData["SPOUSE_NAME"]),
-      sp_employernum: rowData["SP_EMPLOYERNUM"] || "",
-      sp_employertaxid: rowData["SP_EMPLOYERTAXID"] || "",
+      sp_employernum: cleanDigits(rowData["SP_EMPLOYERNUM"], 10),
+      sp_employertaxid: cleanDigits(rowData["SP_EMPLOYERTAXID"], 12),
       sp_typeofemployer: (rowData["SP_TYPEOFEMPLOYER"] === "N/A" || !rowData["SP_TYPEOFEMPLOYER"]) ? "" : (rowData["SP_TYPEOFEMPLOYER"] as "B" | "H"),
       sp_employername: rowData["SP_EMPLOYERNAME"] || "",
       
-      ap_employer_num: rowData["AP_EMPLOYER_NUM"] || "",
-      ap_employer_taxid: rowData["AP_EMPLOYER_TAXID"] || "",
+      ap_employer_num: cleanDigits(rowData["AP_EMPLOYER_NUM"], 10),
+      ap_employer_taxid: cleanDigits(rowData["AP_EMPLOYER_TAXID"], 12),
       ap_typeofemployer: (rowData["AP_TYPEOFEMPLOYER"] === "N/A" || !rowData["AP_TYPEOFEMPLOYER"]) ? "B" : (rowData["AP_TYPEOFEMPLOYER"] as "B" | "H"),
       ap_employer_name: rowData["AP_EMPLOYER_NAME"] || "",
       ap_occupation: rowData["AP_OCCUPATION/CURRENT_POSITION"] || "",
