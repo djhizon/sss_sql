@@ -273,6 +273,9 @@ function ApplyPage() {
     const checkDigits = (name: string, val: string | undefined | null, length: number, required: boolean = false) => {
       if (!val && !required) return null;
       const digits = (val || "").replace(/-/g, "").trim();
+      if (digits.length > 0 && !/^\d+$/.test(digits)) {
+        return `${name} must contain only numbers.`;
+      }
       if (digits.length > 0 && digits.length !== length) {
         return `${name} must be exactly ${length} digits. (Currently ${digits.length})`;
       }
@@ -349,11 +352,13 @@ function ApplyPage() {
     return (
       <ClearableInput
         className="sss-input"
+        maxLength={80}
         style={forceLowercase || props.type === "email" ? { textTransform: "lowercase" } : undefined}
         value={(form[k] as string) ?? ""}
         onChange={(val) => {
           let v = val;
           if (forceLowercase || props.type === "email") v = v.toLowerCase();
+          if (props.type === "tel") v = v.replace(/[^0-9+\-\s()]/g, "");
           set(k, v as never);
         }}
         {...props}
@@ -452,7 +457,7 @@ function ApplyPage() {
                 <SplitAddress isLocalAddress={true} value={form.ap_local_address} onChange={(v) => set("ap_local_address", v)} required />
               </Field>
 
-              <Field label="Telephone No." hint="(area + tel)">{input("ap_tel_no")}</Field>
+              <Field label="Telephone No." hint="(area + tel)">{input("ap_tel_no", { type: "tel", maxLength: 20 })}</Field>
               <Field label="Email Address" className="md:col-span-2" required>{input("ap_email_add", { type: "email", required: true })}</Field>
               
               <Field label="Foreign Address" hint="(for Overseas Filipino Worker)" className="md:col-span-4">
@@ -550,7 +555,7 @@ function ApplyPage() {
               <Field label="Employer Address" required className="md:col-span-4">
                 <SplitAddress value={form.ap_employer_address || ""} onChange={(v) => set("ap_employer_address", v)} required />
               </Field>
-              <Field label="Telephone No." required>{input("ap_employer_tel_no", { required: true })}</Field>
+              <Field label="Telephone No." required>{input("ap_employer_tel_no", { type: "tel", maxLength: 20, required: true })}</Field>
               <Field label="Email Address" required className="md:col-span-2">{input("ap_employer_email_add", { type: "email", required: true })}</Field>
               <Field label="Website">{input("ap_employer_website", { forceLowercase: true })}</Field>
             </div>

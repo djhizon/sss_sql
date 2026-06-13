@@ -62,6 +62,7 @@ export function SplitName({ value, onChange, required }: SplitNameProps) {
         value={last}
         onChange={(val) => handleChange("last", val.toUpperCase())}
         required={required}
+        maxLength={40}
       />
       <ClearableInput
         type="text"
@@ -70,6 +71,7 @@ export function SplitName({ value, onChange, required }: SplitNameProps) {
         value={first}
         onChange={(val) => handleChange("first", val.toUpperCase())}
         required={required}
+        maxLength={40}
       />
       <ClearableInput
         type="text"
@@ -77,6 +79,7 @@ export function SplitName({ value, onChange, required }: SplitNameProps) {
         placeholder="Middle Name"
         value={middle}
         onChange={(val) => handleChange("middle", val.toUpperCase())}
+        maxLength={40}
       />
       <ClearableInput
         type="text"
@@ -84,6 +87,7 @@ export function SplitName({ value, onChange, required }: SplitNameProps) {
         placeholder="Suffix (e.g. JR, II)"
         value={suffix}
         onChange={(val) => handleChange("suffix", val.toUpperCase())}
+        maxLength={10}
       />
     </div>
   );
@@ -126,6 +130,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         placeholder="Rm/Flr/Unit No & Bldg"
         value={room}
         onChange={(val) => handleChange(0, val.toUpperCase())}
+        maxLength={60}
       />
       <ClearableInput
         type="text"
@@ -133,6 +138,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         placeholder="House/Lot & Blk No"
         value={house}
         onChange={(val) => handleChange(1, val.toUpperCase())}
+        maxLength={60}
       />
       <ClearableInput
         type="text"
@@ -141,6 +147,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         value={street}
         onChange={(val) => handleChange(2, val.toUpperCase())}
         required={required}
+        maxLength={60}
       />
       <ClearableInput
         type="text"
@@ -148,6 +155,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         placeholder="Subdivision"
         value={subdivision}
         onChange={(val) => handleChange(3, val.toUpperCase())}
+        maxLength={60}
       />
       <ClearableInput
         type="text"
@@ -156,6 +164,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         value={barangay}
         onChange={(val) => handleChange(4, val.toUpperCase())}
         required={required}
+        maxLength={60}
       />
       <ClearableInput
         type="text"
@@ -164,6 +173,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         value={city}
         onChange={(val) => handleChange(5, val.toUpperCase())}
         required={required}
+        maxLength={60}
       />
       <ClearableInput
         type="text"
@@ -172,6 +182,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
         value={province}
         onChange={(val) => handleChange(6, val.toUpperCase())}
         required={required}
+        maxLength={60}
       />
       {isLocalAddress ? (
         <div className="flex flex-col">
@@ -191,6 +202,7 @@ export function SplitAddress({ value, onChange, required, isLocalAddress }: Spli
           value={postalCode}
           onChange={(val) => handleChange(7, val.toUpperCase())}
           required={required}
+          maxLength={15}
         />
       )}
     </div>

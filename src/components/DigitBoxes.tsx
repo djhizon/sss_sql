@@ -8,7 +8,7 @@ interface DigitBoxesProps {
 }
 
 export function DigitBoxes({ value, onChange, format, required }: DigitBoxesProps) {
-  const digits = value.replace(/[^0-9A-Z]/gi, "");
+  const digits = value.replace(/[^0-9]/g, "");
   const numDigits = format.split("#").length - 1;
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -34,7 +34,7 @@ export function DigitBoxes({ value, onChange, format, required }: DigitBoxesProp
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-    const char = e.target.value.replace(/[^0-9A-Z]/gi, "").slice(-1); // Only take last typed char
+    const char = e.target.value.replace(/[^0-9]/g, "").slice(-1); // Only take last typed char
     if (char) {
       const newDigits = digits.substring(0, idx) + char + digits.substring(idx + 1);
       onChange(newDigits);
@@ -48,7 +48,7 @@ export function DigitBoxes({ value, onChange, format, required }: DigitBoxesProp
 
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/[^0-9A-Z]/gi, "").slice(0, numDigits);
+    const pasted = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, numDigits);
     onChange(pasted);
     const focusIdx = Math.min(pasted.length, numDigits - 1);
     const next = inputRefs.current[focusIdx];
