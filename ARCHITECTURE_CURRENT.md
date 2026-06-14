@@ -80,14 +80,11 @@ The application mimics a native desktop application using Flexbox.
 
 ## 5. Security Edge Cases & Custom APIs
 
-### 5.1. The "Secure Email Change" Bypass
-* **Problem**: Native Supabase/GoTrue auth requires a "double-confirmation" (an email sent to both the old and new addresses) to change an email. When using custom external SMTPs (like Microsoft Graph API), routing these two distinct secure tokens reliably is highly volatile.
-* **Solution**: The application uses a custom, secure backend endpoint (`/api/change-email`).
-* **Flow**:
-  1. User authenticates securely in the app.
-  2. User inputs a new email in the Settings tab.
-  3. The frontend sends the new email and the user's secure session JWT to the custom endpoint.
-  4. The endpoint verifies the JWT, initializes a Supabase Admin client (bypassing RLS), and directly updates the user's email in the Auth database, requiring NO email confirmation links.
+### 5.1. Secure Authentication & Operations
+* **Authentication**: Native Supabase/GoTrue auth is utilized for secure email/password sessions.
+* **RPC Edge Functions**: Several Postgres RPC functions securely handle bypass/escalation tasks:
+  - `check_email_used`: Allows checking if an email exists during settings updates without leaking sensitive user data.
+  - `delete_user`: Allows Admins to perform hard deletes on users within `auth.users` directly from the frontend securely by verifying role authority inside the RPC.
 
 ---
 
@@ -98,24 +95,27 @@ Table: applications
 +-------------------------+-------------------+------------------------------------------+
 | Column Name             | Data Type         | Notes                                    |
 +-------------------------+-------------------+------------------------------------------+
-| app_number              | BIGINT (PK)       | Auto-increment, Zero-padded to 12 digits |
+| app_number              | BIGINT (PK)       | Auto-increment                           |
 | user_id                 | UUID (FK)         | References auth.users                    |
 | status                  | VARCHAR           | 'pending', 'approved', 'rejected'        |
-| notes                   | TEXT              | Admin remarks                            |
+| is_deleted              | BOOLEAN           | Used for soft deletes                    |
+| decision_notes          | TEXT              | Admin remarks on decision                |
 | applicant_name          | VARCHAR           | Full name string                         |
-| ap_ss_num               | VARCHAR(15)       | Stored as raw string (often w/ dashes)   |
+| ap_ss_num               | VARCHAR(15)       | Stored as raw string                     |
 | ap_mobile_no            | VARCHAR(15)       | Stored as raw string                     |
-| ...                     | ...               |                                          |
+| ...                     | ...               | 20+ other demographic/employer columns   |
 | created_at              | TIMESTAMP         | Auto-generated                           |
+| updated_at              | TIMESTAMP         | Auto-updated via trigger                 |
 +-------------------------+-------------------+------------------------------------------+
 
-Table: profiles
+Table: user_roles
 +-------------------------+-------------------+------------------------------------------+
 | Column Name             | Data Type         | Notes                                    |
 +-------------------------+-------------------+------------------------------------------+
-| id                      | UUID (PK)         | References auth.users                    |
-| role                    | VARCHAR           | 'admin' or 'user'                        |
-| full_name               | VARCHAR           | Derived from registration                |
+| id                      | UUID (PK)         |                                          |
+| user_id                 | UUID (FK)         | References auth.users                    |
+| role                    | ENUM              | 'admin' or 'user'                        |
+| created_at              | TIMESTAMP         | Auto-generated                           |
 +-------------------------+-------------------+------------------------------------------+
 ```
 
@@ -126,13 +126,15 @@ Table: profiles
 ```text
 [ Root App / Entry Point ]
        |
-       +--> [ /auth ]  -------------> Login / Register / Forgot Password
+       +--> [ /auth ]  -------------> Login / Register
        |
        +--> [ Protected Routes (Requires JWT Session) ]
                |
                +--> [ /dashboard ] -----> User's Housing Loan History
                |
                +--> [ /apply ]     -----> Multi-section Interactive Form
+               |
+               +--> [ /edit/$id ]  -----> Full CRUD capability for Pending Applications
                |
                +--> [ /settings ]  -----> Security & Profile Management
                |
