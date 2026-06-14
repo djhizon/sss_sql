@@ -48,9 +48,9 @@ function ViewApp() {
     <div className="min-h-screen flex flex-col">
       <SssHeader user={user} isAdmin={adminData?.isAdmin} />
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
-        <div className="mb-3 no-print">
-          <Link to="/dashboard" className="text-sm text-sss-navy underline">
-            ← Back to dashboard
+        <div className="mb-4 no-print">
+          <Link to="/dashboard" className="inline-block px-6 py-2.5 bg-[#0038a8] text-white font-bold uppercase tracking-widest text-sm hover:bg-[#002879] transition-colors rounded-md shadow-md">
+            ← Back to Dashboard
           </Link>
         </div>
 

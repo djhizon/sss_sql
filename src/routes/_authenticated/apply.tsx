@@ -147,9 +147,9 @@ function ApplyPage() {
     async function fetchNextAppNum() {
       const { data } = await supabase.from("applications").select("app_number").order("app_number", { ascending: false }).limit(1);
       if (data && data.length > 0) {
-        setNextAppNumber(String(data[0].app_number + 1).padStart(12, "0"));
+        setNextAppNumber(String(data[0].app_number + 1));
       } else {
-        setNextAppNumber("000000000001");
+        setNextAppNumber("1");
       }
     }
     fetchNextAppNum();
@@ -269,7 +269,7 @@ function ApplyPage() {
       return val.replace(/[^0-9]/g, "").slice(0, max);
     };
 
-    setNextAppNumber(String(rowData["APP_NUMBER"] || "000000000001").padStart(12, '0'));
+    setNextAppNumber(String(rowData["APP_NUMBER"] || "1"));
 
     setForm({
       ap_ss_num: cleanDigits(rowData["AP_SS_NUM"], 10),
