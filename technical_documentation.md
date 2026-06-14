@@ -24,6 +24,9 @@ flowchart TD
         DB[(PostgreSQL Database)]
         RPC[Edge RPC Functions]
     end
+    
+    %% External Services
+    Microsoft[Microsoft 365 SMTP Relay]
 
     %% Flow
     User -->|Visits Website| UI
@@ -36,6 +39,8 @@ flowchart TD
     DataState <-->|3. Secure Escalation| RPC
     RPC -->|Perform Admin Tasks| DB
     RPC -->|Bypass RLS| Auth
+    Auth -->|Sends Auth Emails| Microsoft
+    Microsoft -->|Delivers to Inbox| User
 ```
 
 **How it works:**
@@ -44,6 +49,7 @@ flowchart TD
 3. **The Backend (Supabase)** acts as the central data and identity hub. The frontend communicates with Supabase securely over the internet.
    - **Auth Service** handles login, registration, and password management.
    - **PostgreSQL DB** stores the loan applications and role data securely.
+4. **Microsoft 365 SMTP Relay** acts as the secure email provider, reliably delivering system emails (like registration verification and password resets) from Supabase to the user's inbox.
 
 ---
 
@@ -78,7 +84,7 @@ During registration, the website collects the user's **First Name**, **Last Name
 * **Admin Capabilities:** Admins cannot see or retrieve a user's password. They can only perform secure operations like Hard Deleting a user via custom RPC functions. Users are solely responsible for creating and changing their passwords securely via email reset flows.
 
 ### 3.2. Auth & Registration Entity-Relationship Diagram
-Because Supabase handles authentication natively, the registration data is stored in the `auth.users` system table. The demographic information collected at sign-up is stored inside a JSONB column (`raw_user_meta_data`). For presentation purposes, this diagram breaks down the JSONB object so the professor can see exactly what user fields are captured during Registration.
+Because Supabase handles authentication natively, the registration data is stored in the `auth.users` system table. The demographic information collected at sign-up is stored inside a JSONB column (`raw_user_meta_data`). This diagram conceptually breaks down the JSONB object to illustrate the specific user fields captured during registration.
 
 ```mermaid
 erDiagram
