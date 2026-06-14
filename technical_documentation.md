@@ -1,35 +1,83 @@
 # Technical Specifications & Documentation
 
-## 1. Overview
+## 1. Overview & System Architecture
 The SSS Housing Loan Portal is a modern, responsive web application that allows users to submit, edit, and manage their housing loan applications, while providing administrators with a secure dashboard to review, approve, or reject submissions.
+
+### 1.1. High-Level System Flow
+This diagram illustrates how the different components of the website interact to make the system run.
+
+```mermaid
+flowchart TD
+    %% Entities
+    User((Applicant / Admin))
+    
+    %% Hosting & Frontend
+    subgraph Frontend [Vercel Hosting Layer]
+        UI[React User Interface]
+        ClientRouting[TanStack Router]
+        DataState[TanStack Query State]
+    end
+    
+    %% Backend Services
+    subgraph Backend [Supabase BaaS]
+        Auth[GoTrue Auth Service]
+        DB[(PostgreSQL Database)]
+        RPC[Edge RPC Functions]
+    end
+
+    %% Flow
+    User -->|Visits Website| UI
+    UI <-->|Page Navigation| ClientRouting
+    UI <-->|Fetch/Mutate Data| DataState
+    
+    %% Connections
+    DataState <-->|1. Authenticate (Email/Pass)| Auth
+    DataState <-->|2. CRUD Operations via REST| DB
+    DataState <-->|3. Secure Escalation| RPC
+    RPC -->|Perform Admin Tasks| DB
+    RPC -->|Bypass RLS| Auth
+```
+
+**How it works:**
+1. **The User** accesses the web application, which is hosted globally and delivered quickly via **Vercel**.
+2. **The Frontend (Vercel)** handles all visual components, strict form validations, and routing directly in the user's browser using React.
+3. **The Backend (Supabase)** acts as the central data and identity hub. The frontend communicates with Supabase securely over the internet.
+   - **Auth Service** handles login, registration, and password management.
+   - **PostgreSQL DB** stores the loan applications and role data securely.
+
+---
 
 ## 2. Technical Specifications (Tech Stack)
 
-### 2.1. Frontend
+### 2.1. Frontend & Hosting
+* **Hosting Platform:** Vercel - Provides serverless edge hosting for fast global delivery and automatic CI/CD deployments.
 * **Framework:** React 18
 * **Build Tool:** Vite
 * **Routing:** TanStack Router (`@tanstack/react-router`) - Provides type-safe file-based routing.
-* **State Management & Data Fetching:** TanStack Query (`@tanstack/react-query`) - Handles asynchronous state, caching, and background updates.
-* **Styling:** Vanilla CSS with custom utility classes and design tokens. Strict adherence to the SSS color palette (Navy Blue `#0038a8`, Gold `#fbb034`).
-* **Icons:** Lucide React (`lucide-react`)
-* **Notifications:** Sonner (`sonner`) - For toast notifications.
-* **Animations:** Framer Motion (`framer-motion`) - Powers the sophisticated page transitions and micro-animations.
+* **State Management & Data Fetching:** TanStack Query (`@tanstack/react-query`)
+* **Styling:** Vanilla CSS with custom utility classes and design tokens. Strict adherence to the SSS color palette.
 
 ### 2.2. Backend & Database
 * **Backend-as-a-Service (BaaS):** Supabase
 * **Database:** PostgreSQL
 * **Authentication:** Supabase Auth (GoTrue) - Manages JWT sessions and secure email/password sign-ins.
-* **Security:** Row Level Security (RLS) policies to ensure data isolation. Custom PostgreSQL RPC functions are deployed for elevated tasks (e.g., checking emails securely, hard deleting users).
+* **Security:** Row Level Security (RLS) policies to ensure data isolation. Custom PostgreSQL RPC functions are deployed for elevated tasks.
 
 ### 2.3. Data Validation
-* **Schema Validation:** Zod (`zod`) - Guarantees strict type safety and schema validation for complex application payloads prior to submission.
+* **Schema Validation:** Zod (`zod`) - Guarantees strict type safety and schema validation.
 * **Form Inputs:** Custom masked input components (e.g., `DigitBoxes`) intercept user keystrokes to ensure lengths and formats match the database requirements exactly.
 
 ---
 
 ## 3. Database Design
 
-Below is the Entity-Relationship (ER) diagram representing the core data architecture of the application.
+### 3.1. Why isn't User Info (Name, Birthdate, etc.) attached to the User Table?
+In this architecture, **Authentication Data** is strictly separated from **Application Data** for security and flexibility. 
+* The **`auth.users`** table (managed by Supabase) is responsible *only* for identity validation (Email, Password Hash, and Secure Tokens).
+* Personal Identifiable Information (PII) like First Name, Last Name, Birthdate, Phone Number, and SS Number are gathered specifically for a Housing Loan and are stored entirely within the **`applications`** table. This ensures that sensitive demographic data is subject to the database's strict Row Level Security (RLS) policies and is isolated to the application itself.
+
+### 3.2. Entity-Relationship Diagram
+Below is the ER diagram representing the core data architecture of the application.
 
 ```mermaid
 erDiagram
@@ -51,17 +99,13 @@ erDiagram
         uuid user_id FK "References auth.users"
         application_status status "ENUM: 'pending', 'approved', 'rejected'"
         boolean is_deleted "Soft delete flag"
-        varchar applicant_name "Full Name"
+        varchar applicant_name "Full Name (First, Middle, Last)"
         varchar ap_ss_num "SS Number (10 digits)"
-        varchar ap_crn "CRN (12 digits)"
         date ap_dob "Applicant Date of Birth"
-        varchar ap_sex "M or F"
+        varchar ap_mobile_no "Mobile Phone Number"
         varchar ap_civil_status "S, M, W, SE"
         varchar ap_local_address
-        varchar ap_mobile_no
-        varchar spouse_name "Optional"
         varchar ap_employer_name
-        varchar ap_employer_num
         text decision_notes "Admin comments"
         uuid decided_by FK "References auth.users (Admin who reviewed)"
         timestamptz created_at
