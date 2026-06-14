@@ -145,11 +145,18 @@ function ApplyPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     
     async function fetchNextAppNum() {
-      const { data } = await supabase.from("applications").select("app_number").order("app_number", { ascending: false }).limit(1);
+      // Get the real next app number by excluding synthetic data (which has huge app_numbers).
+      // Real applications have small sequential numbers from BIGSERIAL.
+      const { data } = await supabase
+        .from("applications")
+        .select("app_number")
+        .lt("app_number", 100000000) // exclude synthetic entries with artificially large numbers
+        .order("app_number", { ascending: false })
+        .limit(1);
       if (data && data.length > 0) {
-        setNextAppNumber(String(data[0].app_number + 1));
+        setNextAppNumber(String(data[0].app_number + 1).padStart(12, "0"));
       } else {
-        setNextAppNumber("1");
+        setNextAppNumber("000000000001");
       }
     }
     fetchNextAppNum();
@@ -269,7 +276,7 @@ function ApplyPage() {
       return val.replace(/[^0-9]/g, "").slice(0, max);
     };
 
-    setNextAppNumber(String(rowData["APP_NUMBER"] || "1"));
+    setNextAppNumber(String(rowData["APP_NUMBER"] || "1").padStart(12, '0'));
 
     setForm({
       ap_ss_num: cleanDigits(rowData["AP_SS_NUM"], 10),

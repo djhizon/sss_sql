@@ -89,7 +89,7 @@ function Dashboard() {
                   <tbody className="divide-y divide-gray-100">
                     {apps.slice(0, visibleCount).map((a) => (
                       <tr key={a.app_number} className="hover:bg-blue-50/50 transition-colors">
-                        <td className="px-6 py-4 text-gray-700 font-medium">{a.app_number}</td>
+                        <td className="px-6 py-4 text-gray-700 font-medium">{String(a.app_number).padStart(12, '0')}</td>
                         <td className="px-6 py-4 text-gray-800">{formatName(a.applicant_name)}</td>
                         <td className="px-6 py-4 text-gray-500">
                           {new Date(a.created_at).toLocaleDateString()}

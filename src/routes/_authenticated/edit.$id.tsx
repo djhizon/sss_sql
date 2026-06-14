@@ -268,7 +268,7 @@ function EditPage() {
             <div className="text-xl md:text-2xl font-extrabold tracking-wider mt-2 mb-1 text-sss-navy">APPLICATION FOR HOUSING LOAN</div>
             <div className="text-[10px] text-gray-400 font-medium">MEL-01750 (09-2022)</div>
             <div className="text-sm font-bold mt-4 text-sss-navy-dark border border-gray-200 inline-block px-4 py-1.5 rounded-md bg-white shadow-sm">
-              Application No: <span className="text-sss-navy tracking-widest">{id}</span>
+              Application No: <span className="text-sss-navy tracking-widest">{String(id).padStart(12, "0")}</span>
             </div>
           </div>
 
