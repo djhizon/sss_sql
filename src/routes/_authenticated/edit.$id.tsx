@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SssHeader, SssFooter } from "@/components/SssHeader";
-import { submitApplication, checkIsAdmin } from "@/lib/applications.functions";
+import { updateApplication, getApplication, checkIsAdmin } from "@/lib/applications.functions";
 import type { ApplicationInput } from "@/lib/applications.schema";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
