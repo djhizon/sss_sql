@@ -273,7 +273,7 @@ function AdminPage() {
                           onClick={() => setSelected(r.app_number)}
                           className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-blue-50/80" : "hover:bg-gray-50"}`}
                         >
-                          <td className="px-4 py-3 text-gray-600">{r.app_number}</td>
+                          <td className="px-4 py-3 text-gray-600">{String(r.app_number).padStart(12, '0')}</td>
                           <td className="px-4 py-3 font-medium text-gray-800">{formatName(r.applicant_name)}</td>
                           <td className="px-4 py-3 uppercase text-xs">
                             <span className={statusBadge(r.status)}>{r.status}</span>
