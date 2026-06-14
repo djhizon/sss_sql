@@ -31,7 +31,7 @@ flowchart TD
     UI <-->|Fetch/Mutate Data| DataState
     
     %% Connections
-    DataState <-->|1. Authenticate (Email/Pass)| Auth
+    DataState <-->|"1. Authenticate (Email/Pass)"| Auth
     DataState <-->|2. CRUD Operations via REST| DB
     DataState <-->|3. Secure Escalation| RPC
     RPC -->|Perform Admin Tasks| DB
@@ -71,20 +71,42 @@ flowchart TD
 
 ## 3. Database Design
 
-### 3.1. Why isn't User Info (Name, Birthdate, etc.) attached to the User Table?
-In this architecture, **Authentication Data** is strictly separated from **Application Data** for security and flexibility. 
-* The **`auth.users`** table (managed by Supabase) is responsible *only* for identity validation (Email, Password Hash, and Secure Tokens).
-* Personal Identifiable Information (PII) like First Name, Last Name, Birthdate, Phone Number, and SS Number are gathered specifically for a Housing Loan and are stored entirely within the **`applications`** table. This ensures that sensitive demographic data is subject to the database's strict Row Level Security (RLS) policies and is isolated to the application itself.
+### 3.1. User Registration Data (Auth vs DB)
+During registration, the website collects the user's **First Name**, **Last Name**, **Phone Number**, **Birthdate**, **Email**, and **Password**. 
+* **Where does it go?** This information is passed directly to the Supabase **GoTrue Auth Service**.
+* **Storage Details:** Supabase stores the Email securely, completely hashes the Password (so it is **never visible** to anyone, not even admins), and stores the demographic registration info (Name, Phone, Birthdate) inside a JSONB column called `raw_user_meta_data` inside the `auth.users` table. 
+* **Admin Capabilities:** Admins cannot see or retrieve a user's password. They can only perform secure operations like Hard Deleting a user via custom RPC functions. Users are solely responsible for creating and changing their passwords securely via email reset flows.
 
-### 3.2. Entity-Relationship Diagram
-Below is the ER diagram representing the core data architecture of the application.
+### 3.2. Auth & Registration Entity-Relationship Diagram
+Because Supabase handles authentication natively, the registration data is stored in the `auth.users` system table. The demographic information collected at sign-up is stored inside a JSONB column (`raw_user_meta_data`). For presentation purposes, this diagram breaks down the JSONB object so the professor can see exactly what user fields are captured during Registration.
 
 ```mermaid
 erDiagram
     auth_users {
         uuid id PK
-        varchar email
+        varchar email "User's login email"
+        varchar encrypted_password "HASHED: Never visible to Admins/DBA"
         timestamptz created_at
+    }
+    
+    %% Conceptual representation of the JSONB raw_user_meta_data column
+    raw_user_meta_data_JSON {
+        varchar first_name "Collected at sign-up"
+        varchar last_name "Collected at sign-up"
+        varchar phone "Collected at sign-up"
+        date birthdate "Collected at sign-up"
+    }
+    
+    auth_users ||--|| raw_user_meta_data_JSON : "contains metadata"
+```
+
+### 3.3. Loan Applications Entity-Relationship Diagram
+This diagram represents the actual Postgres database schema for storing submitted housing loan applications and managing user roles.
+
+```mermaid
+erDiagram
+    auth_users {
+        uuid id PK
     }
     
     user_roles {
