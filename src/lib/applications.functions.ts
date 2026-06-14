@@ -25,6 +25,23 @@ export async function submitApplication({ data }: { data: ApplicationInput }) {
   return { app_number: row.app_number as number };
 }
 
+export async function updateApplication({ data, id }: { data: ApplicationInput, id: number }) {
+  const validated = applicationInputSchema.parse(data);
+  const { data: userData, error: userErr } = await supabase.auth.getUser();
+  if (userErr || !userData.user) throw new Error("Unauthorized");
+
+  const isAdmin = await checkIsAdmin();
+  let query = supabase.from("applications").update(cleanOptional(validated) as never).eq("app_number", id);
+  
+  if (!isAdmin.isAdmin) {
+     query = query.eq("user_id", userData.user.id).eq("status", "pending");
+  }
+
+  const { error } = await query;
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
 export async function listMyApplications() {
   const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr || !userData.user) throw new Error("Unauthorized");
@@ -33,6 +50,7 @@ export async function listMyApplications() {
     .from("applications")
     .select("app_number, applicant_name, status, created_at")
     .eq("user_id", userData.user.id)
+    .neq("is_deleted", true)
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -136,5 +154,42 @@ export async function adminUpdateUserRole({ data }: { data: { userId: string; ro
       .upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id, role" });
     if (error) throw new Error(error.message);
   }
+  return { ok: true };
+}
+
+export async function userDeleteApplication({ data: { id } }: { data: { id: number } }) {
+  z.object({ id: z.number().int() }).parse({ id });
+  const { data: userData, error: userErr } = await supabase.auth.getUser();
+  if (userErr || !userData.user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from("applications")
+    .update({ is_deleted: true } as never)
+    .eq("app_number", id)
+    .eq("user_id", userData.user.id);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+export async function adminDeleteApplication({ data: { id } }: { data: { id: number } }) {
+  z.object({ id: z.number().int() }).parse({ id });
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin.isAdmin) throw new Error("Unauthorized");
+  
+  const { error } = await supabase
+    .from("applications")
+    .delete()
+    .eq("app_number", id);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+export async function adminDeleteUser({ data: { userId } }: { data: { userId: string } }) {
+  z.object({ userId: z.string().uuid() }).parse({ userId });
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin.isAdmin) throw new Error("Unauthorized");
+
+  const { error } = await supabase.rpc("delete_user", { target_user_id: userId });
+  if (error) throw new Error(error.message);
   return { ok: true };
 }

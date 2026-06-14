@@ -60,6 +60,15 @@ export default async function handler(req: Request) {
       return new Response(JSON.stringify({ error: 'No current email found' }), { status: 400 });
     }
 
+    // Check if new email is already used
+    const { data: emailUsed, error: emailCheckError } = await supabaseAdmin.rpc('check_email_used', { target_email: newEmail });
+    if (emailCheckError) {
+      return new Response(JSON.stringify({ error: 'Failed to verify email availability' }), { status: 500 });
+    }
+    if (emailUsed) {
+      return new Response(JSON.stringify({ error: 'This email is already registered.' }), { status: 400 });
+    }
+
     // 1. Generate token and save to database
     const token = generateToken(32);
     

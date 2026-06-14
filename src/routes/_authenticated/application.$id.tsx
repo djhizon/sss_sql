@@ -15,7 +15,7 @@ function Row({ label, value }: { label: string; value: unknown }) {
   return (
     <div className="border-b border-dashed py-1.5 grid grid-cols-3 gap-2">
       <div className="sss-label col-span-1">{label}</div>
-      <div className="col-span-2 font-mono text-sm break-words">
+      <div className="col-span-2 text-sm break-words">
         {value === null || value === undefined || value === "" ? (
           <span className="text-muted-foreground">—</span>
         ) : (
@@ -64,7 +64,7 @@ function ViewApp() {
               <div className="text-lg font-extrabold text-primary">APPLICATION FOR HOUSING LOAN</div>
               <div className="mt-2 text-sm text-foreground">
                 <span className="sss-label inline">Application No.:</span>{" "}
-                <span className="font-mono text-base font-bold">{app.app_number}</span>
+                <span className="text-base font-bold">{app.app_number}</span>
               </div>
               <div className="mt-1 text-xs uppercase tracking-wider text-foreground">
                 Status: <span className="font-bold">{app.status}</span>
@@ -124,10 +124,19 @@ function ViewApp() {
               </>
             )}
 
-            <div className="p-4 border-t-2 border-sss-form-border flex justify-end no-print">
+            <div className="p-4 border-t-2 border-sss-form-border flex justify-end gap-3 no-print">
+              {(adminData?.isAdmin || app.status === "pending") && (
+                <Link
+                  to="/edit/$id"
+                  params={{ id: String(app.app_number) }}
+                  className="px-6 py-2 bg-[#0038a8] text-white text-sm uppercase font-bold tracking-widest hover:bg-[#002879] transition-colors shadow-sm"
+                >
+                  Edit Application
+                </Link>
+              )}
               <button
                 onClick={() => window.print()}
-                className="px-4 py-2 border border-sss-form-border text-sm uppercase font-bold"
+                className="px-6 py-2 border border-gray-300 bg-gray-100 hover:bg-gray-200 transition-colors text-sm uppercase font-bold tracking-widest shadow-sm text-gray-700"
               >
                 Print
               </button>

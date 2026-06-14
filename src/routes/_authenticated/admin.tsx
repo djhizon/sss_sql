@@ -10,9 +10,11 @@ import {
   checkIsAdmin,
   adminListUsers,
   adminUpdateUserRole,
+  adminDeleteApplication,
+  adminDeleteUser,
 } from "@/lib/applications.functions";
 import { toast } from "sonner";
-import { Check, X, Search } from "lucide-react";
+import { Check, X, Search, Trash2, Download } from "lucide-react";
 import { ClearableInput } from "@/components/SplitInputs";
 import { formatName, statusBadge } from "@/lib/utils";
 
@@ -90,6 +92,47 @@ function AdminPage() {
     }
   });
 
+  const deleteAppMutation = useMutation({
+    mutationFn: (id: number) => adminDeleteApplication({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Application permanently deleted");
+      setSelected(null);
+      qc.invalidateQueries({ queryKey: ["admin-apps"] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Delete failed")
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId: string) => adminDeleteUser({ data: { userId } }),
+    onSuccess: () => {
+      toast.success("User permanently deleted");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Delete user failed")
+  });
+
+  function exportCSV() {
+    if (filteredRows.length === 0) {
+      toast.error("No applications to export.");
+      return;
+    }
+    const headers = ["App Number", "Applicant Name", "SSS Number", "Status", "Submitted At"];
+    const csvContent = [
+      headers.join(","),
+      ...filteredRows.map(r => 
+        [r.app_number, `"${r.applicant_name}"`, `"${r.ap_ss_num}"`, r.status, new Date(r.created_at).toLocaleString()].join(",")
+      )
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `sss_applications_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   const filteredRows = useMemo(() => {
     let result = [...rows];
     if (searchTerm) {
@@ -142,13 +185,13 @@ function AdminPage() {
         <div className="flex gap-4 mb-6 border-b border-gray-200">
           <button
             onClick={() => setActiveTab("applications")}
-            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "applications" ? "border-b-2 border-[#0038a8] text-primary" : "text-muted-foreground hover:text-foreground"}`}
+            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "applications" ? "border-b-2 border-[#0038a8] text-[#0038a8]" : "text-gray-500 hover:text-gray-800"}`}
           >
             Applications
           </button>
           <button
             onClick={() => setActiveTab("users")}
-            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "users" ? "border-b-2 border-[#0038a8] text-primary" : "text-muted-foreground hover:text-foreground"}`}
+            className={`pb-2 px-2 text-sm font-bold uppercase tracking-wider ${activeTab === "users" ? "border-b-2 border-[#0038a8] text-[#0038a8]" : "text-gray-500 hover:text-gray-800"}`}
           >
             Users
           </button>
@@ -156,7 +199,7 @@ function AdminPage() {
 
         {activeTab === "applications" && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground mb-4">Admin — Application Queue</h2>
+            <h2 className="text-xl font-bold text-sss-navy-dark mb-4">Admin — Application Queue</h2>
             
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
               <div className="flex flex-wrap gap-2 text-xs uppercase">
@@ -164,7 +207,7 @@ function AdminPage() {
                   <button
                     key={s}
                     onClick={() => { setStatus(s); setVisibleAppsCount(getInitialVisibleCount()); }}
-                    className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-sss-form-border bg-sss-form-bg hover:bg-muted text-foreground"}`}
+                    className={`px-4 py-2 border whitespace-nowrap transition-all rounded-md font-bold shadow-sm ${status === s ? "bg-[#0038a8] text-white border-[#0038a8]" : "border-gray-200 bg-white hover:bg-gray-50 text-gray-600"}`}
                   >
                     {s}
                   </button>
@@ -172,14 +215,23 @@ function AdminPage() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                <div className="relative flex items-center w-full sm:w-80">
-                  <Search className="absolute left-2.5 w-4 h-4 text-gray-400 z-10" />
-                  <ClearableInput 
-                    placeholder="Search Name or App #..." 
-                    value={searchTerm}
-                    onChange={(val) => { setSearchTerm(val); setVisibleAppsCount(getInitialVisibleCount()); }}
-                    className="sss-input text-sm py-1.5 pl-9 w-full"
-                  />
+                <div className="flex gap-2">
+                  <div className="relative w-64">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <ClearableInput 
+                      value={searchTerm}
+                      onChange={(val) => { setSearchTerm(val); setVisibleAppsCount(getInitialVisibleCount()); }}
+                      placeholder="Search name, SSS#..."
+                      className="sss-input text-sm pl-9 py-2 w-full bg-white border-gray-200"
+                    />
+                  </div>
+                  <button
+                    onClick={exportCSV}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wide hover:bg-gray-200 rounded-md shadow-sm transition-colors border border-gray-200"
+                    title="Export currently filtered applications to CSV"
+                  >
+                    <Download className="w-4 h-4" /> Export CSV
+                  </button>
                 </div>
                 <select 
                   value={sortBy} 
@@ -195,34 +247,34 @@ function AdminPage() {
             </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
-            <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider shrink-0">
               Applications
             </div>
             <div className="p-0 overflow-auto flex-1 flex flex-col">
               {isLoading ? (
-                <div className="p-6 text-sm text-center text-muted-foreground">Loading…</div>
+                <div className="p-6 text-sm text-center text-gray-500">Loading…</div>
               ) : filteredRows.length === 0 ? (
-                <div className="p-6 text-sm text-center text-muted-foreground">No applications match your criteria.</div>
+                <div className="p-6 text-sm text-center text-gray-500">No applications match your criteria.</div>
               ) : (
                 <>
                   <table className="w-full text-sm">
-                    <thead className="bg-sss-section-bg border-b border-sss-form-border text-left">
+                    <thead className="bg-gray-50 border-b border-gray-200 text-left">
                       <tr>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">#</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Applicant</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Status</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">#</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Applicant</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-sss-form-border">
+                    <tbody className="divide-y divide-gray-100">
                       {filteredRows.slice(0, visibleAppsCount).map((r) => (
                         <tr
                           key={r.app_number}
                           onClick={() => setSelected(r.app_number)}
-                          className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-muted/80" : "hover:bg-muted/50"}`}
+                          className={`cursor-pointer transition-colors ${selected === r.app_number ? "bg-blue-50/80" : "hover:bg-gray-50"}`}
                         >
-                          <td className="px-4 py-3 font-mono text-muted-foreground">{r.app_number}</td>
-                          <td className="px-4 py-3 font-medium text-foreground">{formatName(r.applicant_name)}</td>
+                          <td className="px-4 py-3 text-gray-600">{r.app_number}</td>
+                          <td className="px-4 py-3 font-medium text-gray-800">{formatName(r.applicant_name)}</td>
                           <td className="px-4 py-3 uppercase text-xs">
                             <span className={statusBadge(r.status)}>{r.status}</span>
                           </td>
@@ -231,20 +283,20 @@ function AdminPage() {
                     </tbody>
                   </table>
                   {filteredRows.length > getInitialVisibleCount() && (
-                    <div className="p-3 bg-sss-section-bg border-t border-sss-form-border flex justify-center mt-auto shrink-0">
+                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
                       {visibleAppsCount < filteredRows.length ? (
                         <button 
                           onClick={() => setVisibleAppsCount(prev => prev + 10)}
-                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
                         >
-                          Show More <span className="text-muted-foreground/60">▼</span>
+                          Show More <span className="text-gray-400">▼</span>
                         </button>
                       ) : (
                         <button 
                           onClick={() => setVisibleAppsCount(getInitialVisibleCount())}
-                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
                         >
-                          Show Less <span className="text-muted-foreground/60">▲</span>
+                          Show Less <span className="text-gray-400">▲</span>
                         </button>
                       )}
                     </div>
@@ -254,8 +306,8 @@ function AdminPage() {
             </div>
           </div>
 
-          <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden flex flex-col">
-            <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider">
               Review
             </div>
             <div className="p-6 flex-1 min-h-[60vh] flex flex-col">
@@ -310,7 +362,18 @@ function AdminPage() {
                     </div>
                   )}
 
-                  <div className="pt-4 border-t border-gray-200 mt-auto flex justify-end">
+                  <div className="pt-4 border-t border-gray-200 mt-auto flex justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        if(window.confirm("WARNING: This will permanently delete this application. Proceed?")) {
+                           deleteAppMutation.mutate(detail.app_number);
+                        }
+                      }}
+                      disabled={deleteAppMutation.isPending}
+                      className="text-xs uppercase font-bold tracking-widest text-red-600 border border-red-600 px-4 py-2 hover:bg-red-600 hover:text-white transition-colors rounded-md shadow-sm flex items-center gap-2"
+                    >
+                      <Trash2 className="w-3 h-3" /> Delete
+                    </button>
                     <Link
                       to="/application/$id"
                       params={{ id: String(detail.app_number) }}
@@ -328,37 +391,38 @@ function AdminPage() {
         )}
 
         {activeTab === "users" && (
-          <div className="border border-sss-form-border bg-sss-form-bg shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
-            <div className="bg-sss-section-bg text-foreground text-sm font-bold uppercase py-4 px-6 border-b border-sss-form-border tracking-wider shrink-0">
+          <div className="border border-gray-200 bg-white shadow-sm rounded-xl overflow-hidden flex flex-col h-full">
+            <div className="bg-gray-50/80 text-sss-navy-dark text-sm font-bold uppercase py-4 px-6 border-b border-gray-200 tracking-wider shrink-0">
               Registered Users
             </div>
             <div className="p-0 overflow-auto flex-1 flex flex-col">
               {loadingUsers ? (
-                <div className="p-6 text-sm text-center text-muted-foreground">Loading users…</div>
+                <div className="p-6 text-sm text-center text-gray-500">Loading users…</div>
               ) : users.length === 0 ? (
-                <div className="p-6 text-sm text-center text-muted-foreground">No users found.</div>
+                <div className="p-6 text-sm text-center text-gray-500">No users found.</div>
               ) : (
                 <>
                   <table className="w-full text-sm text-left">
-                    <thead className="bg-sss-section-bg border-b border-sss-form-border">
+                    <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Name</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Email</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Phone</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label">Birthdate</th>
-                        <th className="px-4 py-3 text-xs uppercase font-bold text-sss-label w-32">Role</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Name</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Email</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Phone</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500">Birthdate</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500 w-32">Role</th>
+                        <th className="px-4 py-3 text-xs uppercase font-bold text-gray-500 w-12 text-right"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-sss-form-border">
+                    <tbody className="divide-y divide-gray-100">
                       {users.slice(0, visibleUsersCount).map((u: any) => (
-                        <tr key={u.id} className="hover:bg-muted/50">
-                          <td className="px-4 py-3 font-medium text-foreground">{u.first_name} {u.last_name}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{u.phone || "—"}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{u.birthdate || "—"}</td>
+                        <tr key={u.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 font-medium text-gray-800">{u.first_name} {u.last_name}</td>
+                          <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                          <td className="px-4 py-3 text-gray-600">{u.phone || "—"}</td>
+                          <td className="px-4 py-3 text-gray-600">{u.birthdate || "—"}</td>
                           <td className="px-4 py-3">
                             <select 
-                              className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-primary/20 text-primary border-primary/30' : ''}`}
+                              className={`sss-input text-xs py-1 px-2 pr-8 w-full font-bold uppercase ${u.role === 'admin' ? 'bg-[#e6edfa] text-[#0038a8] border-[#0038a8]/20' : 'text-gray-600'}`}
                               value={u.role}
                               disabled={roleMutation.isPending && roleMutation.variables?.userId === u.id}
                               onChange={(e) => roleMutation.mutate({ userId: u.id, role: e.target.value as "admin" | "user" })}
@@ -367,25 +431,39 @@ function AdminPage() {
                               <option value="admin">Admin</option>
                             </select>
                           </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`WARNING: This will permanently delete user ${u.email}. Proceed?`)) {
+                                  deleteUserMutation.mutate(u.id);
+                                }
+                              }}
+                              disabled={deleteUserMutation.isPending && deleteUserMutation.variables === u.id}
+                              className="text-red-500 hover:text-red-700 p-1"
+                              title="Delete User"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                   {users.length > getInitialVisibleCount() && (
-                    <div className="p-3 bg-sss-section-bg border-t border-sss-form-border flex justify-center mt-auto shrink-0">
+                    <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-center mt-auto shrink-0">
                       {visibleUsersCount < users.length ? (
                         <button 
                           onClick={() => setVisibleUsersCount(prev => prev + 10)}
-                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
                         >
-                          Show More <span className="text-muted-foreground/60">▼</span>
+                          Show More <span className="text-gray-400">▼</span>
                         </button>
                       ) : (
                         <button 
                           onClick={() => setVisibleUsersCount(getInitialVisibleCount())}
-                          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wide"
+                          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 uppercase tracking-wide"
                         >
-                          Show Less <span className="text-muted-foreground/60">▲</span>
+                          Show Less <span className="text-gray-400">▲</span>
                         </button>
                       )}
                     </div>

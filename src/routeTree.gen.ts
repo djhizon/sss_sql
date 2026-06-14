@@ -17,6 +17,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedApplyRouteImport } from './routes/_authenticated/apply'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedEditIdRouteImport } from './routes/_authenticated/edit.$id'
 import { Route as AuthenticatedApplicationIdRouteImport } from './routes/_authenticated/application.$id'
 
 const UpdatePasswordRoute = UpdatePasswordRouteImport.update({
@@ -58,6 +59,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEditIdRoute = AuthenticatedEditIdRouteImport.update({
+  id: '/edit/$id',
+  path: '/edit/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedApplicationIdRoute =
   AuthenticatedApplicationIdRouteImport.update({
     id: '/application/$id',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/application/$id': typeof AuthenticatedApplicationIdRoute
+  '/edit/$id': typeof AuthenticatedEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/application/$id': typeof AuthenticatedApplicationIdRoute
+  '/edit/$id': typeof AuthenticatedEditIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/application/$id': typeof AuthenticatedApplicationIdRoute
+  '/_authenticated/edit/$id': typeof AuthenticatedEditIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/application/$id'
+    | '/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/application/$id'
+    | '/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
     | '/_authenticated/application/$id'
+    | '/_authenticated/edit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -196,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/edit/$id': {
+      id: '/_authenticated/edit/$id'
+      path: '/edit/$id'
+      fullPath: '/edit/$id'
+      preLoaderRoute: typeof AuthenticatedEditIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/application/$id': {
       id: '/_authenticated/application/$id'
       path: '/application/$id'
@@ -212,6 +231,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedApplicationIdRoute: typeof AuthenticatedApplicationIdRoute
+  AuthenticatedEditIdRoute: typeof AuthenticatedEditIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -220,6 +240,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedApplicationIdRoute: AuthenticatedApplicationIdRoute,
+  AuthenticatedEditIdRoute: AuthenticatedEditIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
